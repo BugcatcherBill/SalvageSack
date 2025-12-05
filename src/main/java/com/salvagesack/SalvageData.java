@@ -39,9 +39,22 @@ public class SalvageData
 	 */
 	public void recordLoot(int itemId, String itemName, double expectedDropRate)
 	{
-		SalvageItem item = items.computeIfAbsent(itemId, 
+		recordLoot(itemId, itemName, expectedDropRate, 1);
+	}
+
+	/**
+	 * Record a loot drop with quantity
+	 * Counts as 1 drop for rate calculation, but tracks full quantity
+	 * @param itemId The item ID that was looted
+	 * @param itemName The item name
+	 * @param expectedDropRate Expected drop rate for this item
+	 * @param quantity Number of items looted (for display, not rate calc)
+	 */
+	public void recordLoot(int itemId, String itemName, double expectedDropRate, int quantity)
+	{
+		SalvageItem item = items.computeIfAbsent(itemId,
 			id -> new SalvageItem(id, itemName, expectedDropRate));
-		item.incrementDropCount();
+		item.recordDrop(quantity);  // 1 drop for rate, full quantity for display
 	}
 
 	/**
@@ -50,14 +63,5 @@ public class SalvageData
 	public void incrementTotalLoots()
 	{
 		this.totalLoots++;
-	}
-
-	/**
-	 * Get or create a salvage item
-	 */
-	public SalvageItem getOrCreateItem(int itemId, String itemName, double expectedDropRate)
-	{
-		return items.computeIfAbsent(itemId, 
-			id -> new SalvageItem(id, itemName, expectedDropRate));
 	}
 }

@@ -18,12 +18,12 @@ def runeLiteVersion = 'latest.release'
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
-	compileOnly 'org.projectlombok:lombok:1.18.30'
-	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+	compileOnly 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
-	compileOnly 'com.google.code.gson:gson:2.10.1'
+	compileOnly 'com.google.code.gson:gson:2.11.0'
 
-	testImplementation 'junit:junit:4.12'
+	testImplementation 'junit:junit:4.13.2'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
 }
@@ -61,3 +61,12 @@ tasks.register('shadowJar', Jar) {
 	archiveClassifier.set('shadow')
 	archiveFileName.set("${rootProject.name}-${project.version}-all.jar")
 }
+
+tasks.register('runClient', JavaExec) {
+	group = 'application'
+	description = 'Run RuneLite with the plugin loaded'
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass.set('com.salvagesack.SalvageSackPluginTest')
+	jvmArgs = ['-ea', '--illegal-access=permit']
+}
+

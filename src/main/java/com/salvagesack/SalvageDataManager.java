@@ -2,14 +2,12 @@ package com.salvagesack;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,14 +35,15 @@ public class SalvageDataManager
 	{
 		try (FileWriter writer = new FileWriter(dataFile))
 		{
-			// Convert to a serializable format
-			Map<String, SalvageDataDto> dtoMap = new HashMap<>();
+			SaveDataWrapper wrapper = new SaveDataWrapper();
+			wrapper.shipwrecks = new HashMap<>();
+
 			for (Map.Entry<ShipwreckType, SalvageData> entry : dataMap.entrySet())
 			{
-				dtoMap.put(entry.getKey().name(), SalvageDataDto.fromSalvageData(entry.getValue()));
+				wrapper.shipwrecks.put(entry.getKey().name(), SalvageDataDto.fromSalvageData(entry.getValue()));
 			}
 			
-			gson.toJson(dtoMap, writer);
+			gson.toJson(wrapper, writer);
 			log.debug("Saved salvage data to {}", dataFile.getAbsolutePath());
 		}
 		catch (IOException e)
@@ -68,18 +67,17 @@ public class SalvageDataManager
 
 		try (FileReader reader = new FileReader(dataFile))
 		{
-			Type type = new TypeToken<Map<String, SalvageDataDto>>(){}.getType();
-			Map<String, SalvageDataDto> dtoMap = gson.fromJson(reader, type);
-			
-			if (dtoMap != null)
+			SaveDataWrapper wrapper = gson.fromJson(reader, SaveDataWrapper.class);
+
+			if (wrapper != null && wrapper.shipwrecks != null)
 			{
-				for (Map.Entry<String, SalvageDataDto> entry : dtoMap.entrySet())
+				for (Map.Entry<String, SalvageDataDto> entry : wrapper.shipwrecks.entrySet())
 				{
 					try
 					{
-						ShipwreckType type1 = ShipwreckType.valueOf(entry.getKey());
-						SalvageData data = entry.getValue().toSalvageData(type1);
-						dataMap.put(type1, data);
+						ShipwreckType type = ShipwreckType.valueOf(entry.getKey());
+						SalvageData data = entry.getValue().toSalvageData(type);
+						dataMap.put(type, data);
 					}
 					catch (IllegalArgumentException e)
 					{
@@ -99,12 +97,20 @@ public class SalvageDataManager
 	}
 
 	/**
+	 * Wrapper class for the root JSON object
+	 */
+	private static class SaveDataWrapper
+	{
+		Map<String, SalvageDataDto> shipwrecks;
+	}
+
+	/**
 	 * Data Transfer Object for serialization
 	 */
 	private static class SalvageDataDto
 	{
 		int totalLoots;
-		Map<Integer, SalvageItemDto> items;
+		Map<String, SalvageItemDto> items;
 
 		static SalvageDataDto fromSalvageData(SalvageData data)
 		{
@@ -114,7 +120,7 @@ public class SalvageDataManager
 			
 			for (Map.Entry<Integer, SalvageItem> entry : data.getItems().entrySet())
 			{
-				dto.items.put(entry.getKey(), SalvageItemDto.fromSalvageItem(entry.getValue()));
+				dto.items.put(String.valueOf(entry.getKey()), SalvageItemDto.fromSalvageItem(entry.getValue()));
 			}
 			
 			return dto;
@@ -126,10 +132,18 @@ public class SalvageDataManager
 			
 			if (items != null)
 			{
-				for (Map.Entry<Integer, SalvageItemDto> entry : items.entrySet())
+				for (Map.Entry<String, SalvageItemDto> entry : items.entrySet())
 				{
-					SalvageItem item = entry.getValue().toSalvageItem(entry.getKey());
-					itemsMap.put(entry.getKey(), item);
+					try
+					{
+						int itemId = Integer.parseInt(entry.getKey());
+						SalvageItem item = entry.getValue().toSalvageItem(itemId);
+						itemsMap.put(itemId, item);
+					}
+					catch (NumberFormatException e)
+					{
+						log.warn("Invalid item ID format: {}", entry.getKey());
+					}
 				}
 			}
 			
@@ -144,6 +158,7 @@ public class SalvageDataManager
 	{
 		String itemName;
 		int dropCount;
+		int totalQuantity;
 		double expectedDropRate;
 
 		static SalvageItemDto fromSalvageItem(SalvageItem item)
@@ -151,13 +166,15 @@ public class SalvageDataManager
 			SalvageItemDto dto = new SalvageItemDto();
 			dto.itemName = item.getItemName();
 			dto.dropCount = item.getDropCount();
+			dto.totalQuantity = item.getTotalQuantity();
 			dto.expectedDropRate = item.getExpectedDropRate();
 			return dto;
 		}
 
 		SalvageItem toSalvageItem(int itemId)
 		{
-			return new SalvageItem(itemId, itemName, dropCount, expectedDropRate);
+			int qty = totalQuantity > 0 ? totalQuantity : dropCount;
+			return new SalvageItem(itemId, itemName, dropCount, qty, expectedDropRate);
 		}
 	}
 }

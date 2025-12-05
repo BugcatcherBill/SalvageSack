@@ -49,9 +49,10 @@ public class SalvageDataTest
 	@Test
 	public void testShipwreckTypeFromString()
 	{
-		assertEquals(ShipwreckType.SMALL, ShipwreckType.fromString("Small Shipwreck"));
-		assertEquals(ShipwreckType.MEDIUM, ShipwreckType.fromString("Medium Shipwreck"));
-		assertEquals(ShipwreckType.LARGE, ShipwreckType.fromString("Large Shipwreck"));
+		assertEquals(ShipwreckType.SMALL, ShipwreckType.fromString("Small"));
+		assertEquals(ShipwreckType.LARGE, ShipwreckType.fromString("Large"));
+		assertEquals(ShipwreckType.PIRATE, ShipwreckType.fromString("Plundered"));
+		assertEquals(ShipwreckType.MERCENARY, ShipwreckType.fromString("Martial"));
 		assertEquals(ShipwreckType.UNKNOWN, ShipwreckType.fromString("Random Text"));
 	}
 

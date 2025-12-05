@@ -1,27 +1,30 @@
 package com.salvagesack;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.util.ImageUtil;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.util.AsyncBufferedImage;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Manages fetching and caching of item icons from the OSRS wiki
+ * Manages fetching and caching of item icons using RuneLite's ItemManager
  */
 @Slf4j
 public class ItemIconManager
 {
-	private static final String WIKI_IMAGE_BASE_URL = "https://oldschool.runescape.wiki/images/";
 	private static final int ICON_SIZE = 32;
 	
-	private final Map<String, BufferedImage> iconCache;
+	private final Map<Integer, BufferedImage> iconCache;
 	private final BufferedImage placeholderIcon;
+
+	@Setter
+	private Runnable onIconLoaded;
+
+	@Setter
+	private ItemManager itemManager;
 
 	public ItemIconManager()
 	{
@@ -30,64 +33,53 @@ public class ItemIconManager
 	}
 
 	/**
-	 * Get icon for an item by name
-	 * @param itemName Name of the item
+	 * Get icon for an item by ID
+	 * @param itemId ID of the item
 	 * @return BufferedImage of the item icon, or placeholder if not found
 	 */
-	public BufferedImage getItemIcon(String itemName)
+	public BufferedImage getItemIcon(int itemId)
 	{
+		if (itemId <= 0)
+		{
+			return placeholderIcon;
+		}
+
 		// Check cache first
-		BufferedImage cached = iconCache.get(itemName);
+		BufferedImage cached = iconCache.get(itemId);
 		if (cached != null)
 		{
 			return cached;
 		}
 
-		// Try to fetch from wiki
-		BufferedImage icon = fetchIconFromWiki(itemName);
-		if (icon != null)
+		// Try to get from ItemManager
+		if (itemManager != null)
 		{
-			iconCache.put(itemName, icon);
-			return icon;
+			try
+			{
+				AsyncBufferedImage asyncImage = itemManager.getImage(itemId);
+				if (asyncImage != null)
+				{
+					// Cache when the image loads and trigger callback
+					asyncImage.onLoaded(() -> {
+						iconCache.put(itemId, asyncImage);
+						log.debug("Cached icon for item {}", itemId);
+						if (onIconLoaded != null)
+						{
+							onIconLoaded.run();
+						}
+					});
+					// Return the async image (it extends BufferedImage)
+					return asyncImage;
+				}
+			}
+			catch (Exception e)
+			{
+				log.debug("Failed to get icon for item {}: {}", itemId, e.getMessage());
+			}
 		}
 
 		// Return placeholder if fetch failed
 		return placeholderIcon;
-	}
-
-	/**
-	 * Fetch icon from OSRS wiki
-	 */
-	private BufferedImage fetchIconFromWiki(String itemName)
-	{
-		try
-		{
-			// Convert item name to wiki image format
-			// Example: "Plank" -> "Plank_detail.png"
-			String imageName = itemName.replace(" ", "_") + "_detail.png";
-			
-			// Use URI encoding for proper URL formatting
-			String imageUrl = WIKI_IMAGE_BASE_URL + imageName.replace(" ", "_");
-			
-			log.debug("Fetching icon from: {}", imageUrl);
-			
-			URL url = new URL(imageUrl);
-			try (InputStream in = url.openStream())
-			{
-				BufferedImage image = ImageIO.read(in);
-				if (image != null)
-				{
-					// Resize to standard icon size
-					return ImageUtil.resizeImage(image, ICON_SIZE, ICON_SIZE);
-				}
-			}
-		}
-		catch (IOException e)
-		{
-			log.debug("Failed to fetch icon for {}: {}", itemName, e.getMessage());
-		}
-
-		return null;
 	}
 
 	/**
@@ -112,13 +104,5 @@ public class ItemIconManager
 			}
 		}
 		return image;
-	}
-
-	/**
-	 * Clear the icon cache
-	 */
-	public void clearCache()
-	{
-		iconCache.clear();
 	}
 }

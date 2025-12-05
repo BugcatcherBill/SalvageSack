@@ -10,7 +10,8 @@ public class SalvageItem
 {
 	private final int itemId;
 	private final String itemName;
-	private int dropCount;
+	private int dropCount;      // Number of times this item was dropped (for rate calculation)
+	private int totalQuantity;  // Total quantity received (for display)
 	private final double expectedDropRate; // Expected rate from wiki (e.g., 0.1 for 10%)
 
 	public SalvageItem(int itemId, String itemName, double expectedDropRate)
@@ -18,26 +19,53 @@ public class SalvageItem
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.dropCount = 0;
+		this.totalQuantity = 0;
 		this.expectedDropRate = expectedDropRate;
 	}
 
+
 	/**
-	 * Constructor for deserialization
+	 * Full constructor for deserialization with quantity
 	 */
-	public SalvageItem(int itemId, String itemName, int dropCount, double expectedDropRate)
+	public SalvageItem(int itemId, String itemName, int dropCount, int totalQuantity, double expectedDropRate)
 	{
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.dropCount = dropCount;
+		this.totalQuantity = totalQuantity;
 		this.expectedDropRate = expectedDropRate;
 	}
 
 	/**
-	 * Increment the drop count for this item
+	 * Increment the drop count for this item (single drop)
 	 */
 	public void incrementDropCount()
 	{
 		this.dropCount++;
+		this.totalQuantity++;
+	}
+
+	/**
+	 * Record a drop with a specific quantity
+	 * Counts as 1 drop for rate calculation, but adds full quantity to total
+	 * @param quantity The quantity received in this drop
+	 */
+	public void recordDrop(int quantity)
+	{
+		this.dropCount++;           // Only 1 drop for rate calculation
+		this.totalQuantity += quantity;  // Full quantity for display
+	}
+
+	/**
+	 * Add to the drop count for this item (legacy method)
+	 * @param amount Amount to add
+	 * @deprecated Use recordDrop(quantity) instead
+	 */
+	@Deprecated
+	public void addDropCount(int amount)
+	{
+		this.dropCount += amount;
+		this.totalQuantity += amount;
 	}
 
 	/**

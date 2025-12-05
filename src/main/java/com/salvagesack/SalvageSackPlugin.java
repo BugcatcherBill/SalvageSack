@@ -3,17 +3,21 @@ package com.salvagesack;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.RuneLite;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.http.api.item.ItemPrice;
 
 import javax.inject.Inject;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashMap;
@@ -27,20 +31,16 @@ import java.util.regex.Pattern;
 	description = "Tracks salvage loot from the Sailing skill by shipwreck type",
 	tags = {"sailing", "salvage", "tracking", "loot"}
 )
+@SuppressWarnings("unused") // Fields and methods are used by RuneLite's dependency injection and event system
 public class SalvageSackPlugin extends Plugin
 {
 	// Pattern to match salvage loot messages
-	// Example: "You salvage a Plank from the Small Shipwreck."
+	// Salvage types: Small, Fishy, Barracuda, Large, Pirate, Martial, Fremennik, Opulent
+	// Example: "You sort through the Martial salvage and find: 1 x Adamant 2h sword."
 	private static final Pattern SALVAGE_PATTERN = Pattern.compile(
-		"You salvage (?:an? )?(.+?) from the (.+?)\\.",
+		"You sort through the (.+?) salvage and find: (\\d+) x (.+?)\\.",
 		Pattern.CASE_INSENSITIVE
 	);
-
-	@Inject
-	private Client client;
-
-	@Inject
-	private SalvageSackConfig config;
 
 	@Inject
 	private ClientToolbar clientToolbar;
@@ -48,14 +48,17 @@ public class SalvageSackPlugin extends Plugin
 	@Inject
 	private ConfigManager configManager;
 
+	@Inject
+	private ItemManager itemManager;
+
 	private SalvageSackPanel panel;
 	private NavigationButton navButton;
 	private SalvageDataManager dataManager;
-	private ItemIconManager iconManager;
+	private DropRateManager dropRateManager;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		log.info("Salvage Sack started!");
 
@@ -63,16 +66,29 @@ public class SalvageSackPlugin extends Plugin
 		salvageDataMap = new HashMap<>();
 		
 		// Initialize icon manager
-		iconManager = new ItemIconManager();
-		
+		ItemIconManager iconManager = new ItemIconManager();
+		iconManager.setItemManager(itemManager);
+
 		// Initialize data manager
-		File dataDirectory = new File(configManager.getConfigurationDirectory(), "salvagesack");
+		File runeliteDir = RuneLite.RUNELITE_DIR;
+		if (runeliteDir == null)
+		{
+			runeliteDir = new File(System.getProperty("user.home"), ".runelite");
+		}
+		File dataDirectory = new File(runeliteDir, "salvagesack");
 		if (!dataDirectory.exists())
 		{
-			dataDirectory.mkdirs();
+			boolean created = dataDirectory.mkdirs();
+			if (!created)
+			{
+				log.warn("Failed to create data directory: {}", dataDirectory.getAbsolutePath());
+			}
 		}
 		dataManager = new SalvageDataManager(dataDirectory);
 		
+		// Initialize drop rate manager
+		dropRateManager = new DropRateManager(dataDirectory);
+
 		// Load saved data
 		Map<ShipwreckType, SalvageData> loadedData = dataManager.loadData();
 		if (loadedData != null && !loadedData.isEmpty())
@@ -83,10 +99,37 @@ public class SalvageSackPlugin extends Plugin
 
 		// Initialize panel
 		panel = new SalvageSackPanel(iconManager);
+		panel.setDropRateManager(dropRateManager);
 		panel.updateData(salvageDataMap);
 
+		// Set up icon loaded callback to repaint panel when async icons finish loading
+		iconManager.setOnIconLoaded(() -> {
+			if (panel != null)
+			{
+				panel.repaint();
+			}
+		});
+
 		// Create navigation button
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "/icon.png");
+		BufferedImage icon;
+		try
+		{
+			icon = ImageUtil.loadImageResource(getClass(), "/icon.png");
+		}
+		catch (Exception e)
+		{
+			log.warn("Failed to load icon, using fallback", e);
+			// Create a visible fallback icon
+			icon = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = icon.createGraphics();
+			g.setColor(new Color(66, 134, 244)); // Blue color
+			g.fillRect(0, 0, 16, 16);
+			g.setColor(Color.WHITE);
+			g.setFont(new Font("Arial", Font.BOLD, 12));
+			g.drawString("S", 4, 13);
+			g.dispose();
+		}
+
 		navButton = NavigationButton.builder()
 			.tooltip("Salvage Sack")
 			.icon(icon)
@@ -95,10 +138,11 @@ public class SalvageSackPlugin extends Plugin
 			.build();
 
 		clientToolbar.addNavigation(navButton);
+		log.info("Navigation button added to toolbar");
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		log.info("Salvage Sack stopped!");
 
@@ -125,38 +169,49 @@ public class SalvageSackPlugin extends Plugin
 			return;
 		}
 
-		String message = event.getMessage();
+		// Strip HTML tags from the message
+		String message = event.getMessage()
+			.replaceAll("<[^>]*>", "")
+			.replaceAll("&lt;", "<")
+			.replaceAll("&gt;", ">")
+			.replaceAll("&amp;", "&");
+
+		// Log all game messages for debugging (can be removed later)
+		if (message.toLowerCase().contains("salvage"))
+		{
+			log.info("Salvage message detected: {}", message);
+		}
+
 		Matcher matcher = SALVAGE_PATTERN.matcher(message);
 
 		if (matcher.find())
 		{
-			String itemName = matcher.group(1).trim();
-			String shipwreckName = matcher.group(2).trim();
+			String salvageType = matcher.group(1).trim();  // e.g., "martial"
+			int quantity = Integer.parseInt(matcher.group(2).trim());  // e.g., 1
+			String itemName = matcher.group(3).trim();  // e.g., "Adamant 2h sword"
 
-			log.debug("Detected salvage: {} from {}", itemName, shipwreckName);
+			log.info("Parsed salvage: type='{}' quantity={} item='{}'", salvageType, quantity, itemName);
 
-			// Determine shipwreck type
-			ShipwreckType shipwreckType = ShipwreckType.fromString(shipwreckName);
-			
+			// Determine shipwreck type from salvage type
+			ShipwreckType shipwreckType = ShipwreckType.fromString(salvageType);
+
 			// Get or create salvage data for this shipwreck type
 			SalvageData data = salvageDataMap.computeIfAbsent(
 				shipwreckType, 
-				type -> new SalvageData(type)
+				SalvageData::new
 			);
 
 			// Increment total loots
 			data.incrementTotalLoots();
 
-			// Get item ID from hash of the name (temporary solution)
-			// TODO: Use RuneLite's ItemManager to get proper item IDs when available
-			// This hash-based approach may have collisions but is sufficient for basic tracking
-			int itemId = itemName.hashCode() & 0x7FFFFFFF;
+			// Look up item ID using ItemManager
+			int itemId = lookupItemId(itemName);
 
 			// Get expected drop rate (default to 0 for unknown items)
 			double expectedRate = getExpectedDropRate(shipwreckType, itemName);
 
-			// Record the loot
-			data.recordLoot(itemId, itemName, expectedRate);
+			// Record the loot with quantity
+			data.recordLoot(itemId, itemName, expectedRate, quantity);
 
 			// Update the panel
 			panel.updateData(salvageDataMap);
@@ -164,51 +219,125 @@ public class SalvageSackPlugin extends Plugin
 			// Save data
 			dataManager.saveData(salvageDataMap);
 
-			log.debug("Recorded salvage: {} (ID: {}) from {}", itemName, itemId, shipwreckType);
+			log.info("Recorded salvage: {}x {} (ID: {}) from {}", quantity, itemName, itemId, shipwreckType);
 		}
 	}
 
 	/**
+	 * Look up an item ID by name using the ItemManager
+	 */
+	private int lookupItemId(String itemName)
+	{
+		if (itemManager != null)
+		{
+			try
+			{
+				// Search for the item by name
+				int itemId = itemManager.search(itemName).stream()
+					.findFirst()
+					.map(ItemPrice::getId)
+					.orElse(-1);
+
+				if (itemId != -1)
+				{
+					log.debug("Found item ID {} for '{}'", itemId, itemName);
+					return itemId;
+				}
+			}
+			catch (Exception e)
+			{
+				log.debug("Failed to look up item ID for '{}': {}", itemName, e.getMessage());
+			}
+		}
+
+		// Fallback to hash-based ID if lookup fails
+		return itemName.hashCode() & 0x7FFFFFFF;
+	}
+
+	/**
 	 * Get expected drop rate for an item from a specific shipwreck type
-	 * This should ideally be loaded from a configuration or wiki data
+	 * Loads rates from drop_rates.json configuration file
 	 */
 	private double getExpectedDropRate(ShipwreckType shipwreckType, String itemName)
 	{
-		// Placeholder expected drop rates
-		// In a real implementation, these would come from wiki data or configuration
-		
-		// Common items (~50%)
-		if (itemName.equalsIgnoreCase("Plank") || 
-		    itemName.equalsIgnoreCase("Logs") ||
-		    itemName.equalsIgnoreCase("Rope"))
+		if (dropRateManager != null)
 		{
-			return 0.50;
+			return dropRateManager.getExpectedDropRate(shipwreckType, itemName);
 		}
-		
-		// Uncommon items (~25%)
-		if (itemName.equalsIgnoreCase("Steel bar") || 
-		    itemName.equalsIgnoreCase("Coal") ||
-		    itemName.equalsIgnoreCase("Iron ore"))
+		return 0.0;
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (!event.getGroup().equals("salvagesack"))
 		{
-			return 0.25;
-		}
-		
-		// Rare items (~10%)
-		if (itemName.equalsIgnoreCase("Gold ore") || 
-		    itemName.equalsIgnoreCase("Mithril bar"))
-		{
-			return 0.10;
-		}
-		
-		// Very rare items (~5%)
-		if (itemName.equalsIgnoreCase("Adamant bar") || 
-		    itemName.equalsIgnoreCase("Rune ore"))
-		{
-			return 0.05;
+			return;
 		}
 
-		// Default for unknown items
-		return 0.0;
+		String key = event.getKey();
+
+		// Only handle when changed to true
+		if (!"true".equals(event.getNewValue()))
+		{
+			return;
+		}
+
+		switch (key)
+		{
+			case "resetSmall":
+				resetShipwreckData(ShipwreckType.SMALL);
+				configManager.setConfiguration("salvagesack", "resetSmall", false);
+				break;
+			case "resetFishermans":
+				resetShipwreckData(ShipwreckType.FISHERMANS);
+				configManager.setConfiguration("salvagesack", "resetFishermans", false);
+				break;
+			case "resetBarracuda":
+				resetShipwreckData(ShipwreckType.BARRACUDA);
+				configManager.setConfiguration("salvagesack", "resetBarracuda", false);
+				break;
+			case "resetLarge":
+				resetShipwreckData(ShipwreckType.LARGE);
+				configManager.setConfiguration("salvagesack", "resetLarge", false);
+				break;
+			case "resetPirate":
+				resetShipwreckData(ShipwreckType.PIRATE);
+				configManager.setConfiguration("salvagesack", "resetPirate", false);
+				break;
+			case "resetMercenary":
+				resetShipwreckData(ShipwreckType.MERCENARY);
+				configManager.setConfiguration("salvagesack", "resetMercenary", false);
+				break;
+			case "resetFremennik":
+				resetShipwreckData(ShipwreckType.FREMENNIK);
+				configManager.setConfiguration("salvagesack", "resetFremennik", false);
+				break;
+			case "resetMerchant":
+				resetShipwreckData(ShipwreckType.MERCHANT);
+				configManager.setConfiguration("salvagesack", "resetMerchant", false);
+				break;
+			case "resetAll":
+				resetAllData();
+				configManager.setConfiguration("salvagesack", "resetAll", false);
+				break;
+		}
+	}
+
+	private void resetShipwreckData(ShipwreckType type)
+	{
+		salvageDataMap.remove(type);
+		panel.updateData(salvageDataMap);
+		dataManager.saveData(salvageDataMap);
+		log.info("Reset data for {}", type.getDisplayName());
+	}
+
+	private void resetAllData()
+	{
+		salvageDataMap.clear();
+		panel.updateData(salvageDataMap);
+		dataManager.saveData(salvageDataMap);
+		log.info("Reset all salvage data");
 	}
 
 	@Provides
