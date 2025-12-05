@@ -18,11 +18,13 @@ import java.util.Map;
 public class SalvageSackPanel extends PluginPanel
 {
 	private final JPanel contentPanel;
+	private final ItemIconManager iconManager;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
 
-	public SalvageSackPanel()
+	public SalvageSackPanel(ItemIconManager iconManager)
 	{
 		super(false);
+		this.iconManager = iconManager;
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
@@ -153,11 +155,10 @@ public class SalvageSackPanel extends PluginPanel
 		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 		leftPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-		// Item icon placeholder (will be replaced with actual wiki images)
-		JLabel iconLabel = new JLabel();
-		iconLabel.setPreferredSize(new Dimension(24, 24));
-		iconLabel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		iconLabel.setOpaque(true);
+		// Fetch item icon from wiki
+		BufferedImage icon = iconManager.getItemIcon(item.getItemName());
+		JLabel iconLabel = new JLabel(new ImageIcon(icon));
+		iconLabel.setPreferredSize(new Dimension(32, 32));
 		leftPanel.add(iconLabel);
 
 		JLabel nameLabel = new JLabel(item.getItemName());

@@ -51,6 +51,7 @@ public class SalvageSackPlugin extends Plugin
 	private SalvageSackPanel panel;
 	private NavigationButton navButton;
 	private SalvageDataManager dataManager;
+	private ItemIconManager iconManager;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
 
 	@Override
@@ -60,6 +61,9 @@ public class SalvageSackPlugin extends Plugin
 
 		// Initialize data structures
 		salvageDataMap = new HashMap<>();
+		
+		// Initialize icon manager
+		iconManager = new ItemIconManager();
 		
 		// Initialize data manager
 		File dataDirectory = new File(configManager.getConfigurationDirectory(), "salvagesack");
@@ -78,7 +82,7 @@ public class SalvageSackPlugin extends Plugin
 		}
 
 		// Initialize panel
-		panel = new SalvageSackPanel();
+		panel = new SalvageSackPanel(iconManager);
 		panel.updateData(salvageDataMap);
 
 		// Create navigation button
