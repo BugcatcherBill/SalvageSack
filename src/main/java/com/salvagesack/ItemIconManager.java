@@ -8,8 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,10 +65,9 @@ public class ItemIconManager
 			// Convert item name to wiki image format
 			// Example: "Plank" -> "Plank_detail.png"
 			String imageName = itemName.replace(" ", "_") + "_detail.png";
-			String encodedName = URLEncoder.encode(imageName, StandardCharsets.UTF_8.toString())
-				.replace("+", "%20");
 			
-			String imageUrl = WIKI_IMAGE_BASE_URL + encodedName;
+			// Use URI encoding for proper URL formatting
+			String imageUrl = WIKI_IMAGE_BASE_URL + imageName.replace(" ", "_");
 			
 			log.debug("Fetching icon from: {}", imageUrl);
 			

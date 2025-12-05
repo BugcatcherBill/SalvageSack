@@ -147,8 +147,9 @@ public class SalvageSackPlugin extends Plugin
 			// Increment total loots
 			data.incrementTotalLoots();
 
-			// Get item ID (for now, we'll use a hash of the name as placeholder)
-			// In a real implementation, this would query the item database
+			// Get item ID from hash of the name (temporary solution)
+			// TODO: Use RuneLite's ItemManager to get proper item IDs when available
+			// This hash-based approach may have collisions but is sufficient for basic tracking
 			int itemId = itemName.hashCode() & 0x7FFFFFFF;
 
 			// Get expected drop rate (default to 0 for unknown items)
