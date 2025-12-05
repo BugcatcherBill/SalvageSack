@@ -5,7 +5,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Stores all salvage tracking data for a specific shipwreck type
+ * Stores all salvage tracking data for a specific shipwreck type.
+ * <p>
+ * Each shipwreck type maintains its own loot statistics including total sorts,
+ * individual item drop counts, and a timestamp for UI ordering.
+ * </p>
+ * <p>
+ * The panel displays shipwreck sections sorted by {@link #lastUpdated} so that
+ * the most recently active shipwreck always appears at the top, regardless of
+ * whether it is expanded or collapsed.
+ * </p>
  */
 @Data
 public class SalvageData
@@ -14,11 +23,18 @@ public class SalvageData
 	private int totalLoots;
 	private final Map<Integer, SalvageItem> items; // itemId -> SalvageItem
 
+	/**
+	 * Timestamp (milliseconds since epoch) of the last loot recorded for this shipwreck.
+	 * Used to sort shipwreck panels in the UI with most recently updated at the top.
+	 */
+	private long lastUpdated;
+
 	public SalvageData(ShipwreckType shipwreckType)
 	{
 		this.shipwreckType = shipwreckType;
 		this.totalLoots = 0;
 		this.items = new ConcurrentHashMap<>();
+		this.lastUpdated = 0;
 	}
 
 	/**
@@ -29,6 +45,7 @@ public class SalvageData
 		this.shipwreckType = shipwreckType;
 		this.totalLoots = totalLoots;
 		this.items = items;
+		this.lastUpdated = 0;
 	}
 
 	/**
@@ -58,10 +75,16 @@ public class SalvageData
 	}
 
 	/**
-	 * Increment total loot count
+	 * Increment total loot count and update the last modified timestamp.
+	 * <p>
+	 * This method should be called once per salvage sort action. The timestamp
+	 * update ensures this shipwreck type will be displayed at the top of the
+	 * panel, as shipwrecks are sorted by most recently updated.
+	 * </p>
 	 */
 	public void incrementTotalLoots()
 	{
 		this.totalLoots++;
+		this.lastUpdated = System.currentTimeMillis();
 	}
 }

@@ -29,6 +29,7 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 - **Quantity Tracking**: Shows total quantity received for stackable items
 - **Collapsible Sections**: Accordion-style panels for each shipwreck type
 - **Compact Design**: Sections collapse when empty, expand when they have data
+- **Auto-Sorted Sections**: Most recently updated shipwreck always appears at the top
 
 ### 💾 Persistent Data
 - All tracking data is automatically saved between sessions
@@ -65,6 +66,7 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 Each shipwreck type has a collapsible section showing:
 - **Section Header**: Shipwreck name and total sorts for that type
 - **Arrow Icon**: Click to expand/collapse the section
+- **Auto-Sorting**: The most recently updated shipwreck automatically moves to the top of the panel
 - **Item Rows**: Each item you've received, showing:
   - Item icon (32x32)
   - Item name

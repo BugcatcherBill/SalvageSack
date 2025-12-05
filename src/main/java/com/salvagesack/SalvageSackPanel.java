@@ -12,7 +12,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -131,27 +134,27 @@ public class SalvageSackPanel extends PluginPanel
 			}
 			else
 			{
+				// Collect all shipwrecks with data and sort by lastUpdated (most recent first)
+				List<SalvageData> shipwrecksWithData = new ArrayList<>();
 				for (ShipwreckType type : ShipwreckType.values())
 				{
-					if (type == ShipwreckType.UNKNOWN)
-					{
-						continue;
-					}
-
 					SalvageData data = salvageDataMap.get(type);
 					if (data != null && data.getTotalLoots() > 0)
 					{
-						contentPanel.add(createShipwreckPanel(data));
-						contentPanel.add(Box.createVerticalStrut(4));
+						shipwrecksWithData.add(data);
 					}
 				}
 
-				SalvageData unknownData = salvageDataMap.get(ShipwreckType.UNKNOWN);
-				if (unknownData != null && unknownData.getTotalLoots() > 0)
+				// Sort by lastUpdated descending (most recently updated first)
+				shipwrecksWithData.sort(Comparator.comparingLong(SalvageData::getLastUpdated).reversed());
+
+				for (SalvageData data : shipwrecksWithData)
 				{
-					contentPanel.add(createShipwreckPanel(unknownData));
+					contentPanel.add(createShipwreckPanel(data));
+					contentPanel.add(Box.createVerticalStrut(4));
 				}
 			}
+
 
 			contentPanel.revalidate();
 			contentPanel.repaint();
