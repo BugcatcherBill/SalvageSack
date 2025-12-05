@@ -59,7 +59,6 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 ### Reading the Panel
 
 #### Header
-- Shows "Salvage Sack" title
 - Displays total number of sorts across all shipwreck types
 
 #### Shipwreck Sections
