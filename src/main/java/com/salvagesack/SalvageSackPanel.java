@@ -119,7 +119,7 @@ public class SalvageSackPanel extends PluginPanel
 					totalOpens += data.getTotalLoots();
 				}
 			}
-			totalOpensLabel.setText(totalOpens + " Sorts");
+			totalOpensLabel.setText(totalOpens + "  Total Sorts");
 
 			if (salvageDataMap == null || salvageDataMap.isEmpty())
 			{
