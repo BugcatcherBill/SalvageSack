@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Panel that displays salvage tracking information
@@ -35,6 +36,12 @@ public class SalvageSackPanel extends PluginPanel
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
+
+	@lombok.Setter
+	private Consumer<ShipwreckType> onResetShipwreck;
+
+	@lombok.Setter
+	private Runnable onResetAll;
 
 	public SalvageSackPanel(ItemIconManager iconManager)
 	{
@@ -208,14 +215,26 @@ public class SalvageSackPanel extends PluginPanel
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				boolean newState = !expandedState.getOrDefault(type, true);
-				expandedState.put(type, newState);
-				arrowLabel.setText(newState ? ARROW_DOWN : ARROW_RIGHT);
-				itemsPanel.setVisible(newState);
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					boolean newState = !expandedState.getOrDefault(type, true);
+					expandedState.put(type, newState);
+					arrowLabel.setText(newState ? ARROW_DOWN : ARROW_RIGHT);
+					itemsPanel.setVisible(newState);
 
-				// Revalidate the entire content panel to recalculate sizes
-				contentPanel.revalidate();
-				contentPanel.repaint();
+					// Revalidate the entire content panel to recalculate sizes
+					contentPanel.revalidate();
+					contentPanel.repaint();
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e)
+			{
+				if (SwingUtilities.isRightMouseButton(e))
+				{
+					showContextMenu(e, type);
+				}
 			}
 
 			@Override
@@ -359,5 +378,49 @@ public class SalvageSackPanel extends PluginPanel
 		int g = (int) (c1.getGreen() + t * (c2.getGreen() - c1.getGreen()));
 		int b = (int) (c1.getBlue() + t * (c2.getBlue() - c1.getBlue()));
 		return new Color(r, g, b);
+	}
+
+	/**
+	 * Show context menu for shipwreck section
+	 */
+	private void showContextMenu(MouseEvent e, ShipwreckType type)
+	{
+		JPopupMenu menu = new JPopupMenu();
+
+		JMenuItem resetItem = new JMenuItem("Reset " + type.getDisplayName() + " Data");
+		resetItem.addActionListener(ev -> {
+			int confirm = JOptionPane.showConfirmDialog(
+				this,
+				"Are you sure you want to reset all data for " + type.getDisplayName() + "?",
+				"Confirm Reset",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE
+			);
+			if (confirm == JOptionPane.YES_OPTION && onResetShipwreck != null)
+			{
+				onResetShipwreck.accept(type);
+			}
+		});
+		menu.add(resetItem);
+
+		menu.addSeparator();
+
+		JMenuItem resetAllItem = new JMenuItem("Reset All Data");
+		resetAllItem.addActionListener(ev -> {
+			int confirm = JOptionPane.showConfirmDialog(
+				this,
+				"Are you sure you want to reset ALL salvage data?",
+				"Confirm Reset All",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE
+			);
+			if (confirm == JOptionPane.YES_OPTION && onResetAll != null)
+			{
+				onResetAll.run();
+			}
+		});
+		menu.add(resetAllItem);
+
+		menu.show(e.getComponent(), e.getX(), e.getY());
 	}
 }

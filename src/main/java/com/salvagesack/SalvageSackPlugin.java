@@ -6,7 +6,6 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -44,9 +43,6 @@ public class SalvageSackPlugin extends Plugin
 
 	@Inject
 	private ClientToolbar clientToolbar;
-
-	@Inject
-	private ConfigManager configManager;
 
 	@Inject
 	private ItemManager itemManager;
@@ -100,6 +96,8 @@ public class SalvageSackPlugin extends Plugin
 		// Initialize panel
 		panel = new SalvageSackPanel(iconManager);
 		panel.setDropRateManager(dropRateManager);
+		panel.setOnResetShipwreck(this::resetShipwreckData);
+		panel.setOnResetAll(this::resetAllData);
 		panel.updateData(salvageDataMap);
 
 		// Set up icon loaded callback to repaint panel when async icons finish loading
@@ -267,62 +265,6 @@ public class SalvageSackPlugin extends Plugin
 		return 0.0;
 	}
 
-	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
-	{
-		if (!event.getGroup().equals("salvagesack"))
-		{
-			return;
-		}
-
-		String key = event.getKey();
-
-		// Only handle when changed to true
-		if (!"true".equals(event.getNewValue()))
-		{
-			return;
-		}
-
-		switch (key)
-		{
-			case "resetSmall":
-				resetShipwreckData(ShipwreckType.SMALL);
-				configManager.setConfiguration("salvagesack", "resetSmall", false);
-				break;
-			case "resetFishermans":
-				resetShipwreckData(ShipwreckType.FISHERMANS);
-				configManager.setConfiguration("salvagesack", "resetFishermans", false);
-				break;
-			case "resetBarracuda":
-				resetShipwreckData(ShipwreckType.BARRACUDA);
-				configManager.setConfiguration("salvagesack", "resetBarracuda", false);
-				break;
-			case "resetLarge":
-				resetShipwreckData(ShipwreckType.LARGE);
-				configManager.setConfiguration("salvagesack", "resetLarge", false);
-				break;
-			case "resetPirate":
-				resetShipwreckData(ShipwreckType.PIRATE);
-				configManager.setConfiguration("salvagesack", "resetPirate", false);
-				break;
-			case "resetMercenary":
-				resetShipwreckData(ShipwreckType.MERCENARY);
-				configManager.setConfiguration("salvagesack", "resetMercenary", false);
-				break;
-			case "resetFremennik":
-				resetShipwreckData(ShipwreckType.FREMENNIK);
-				configManager.setConfiguration("salvagesack", "resetFremennik", false);
-				break;
-			case "resetMerchant":
-				resetShipwreckData(ShipwreckType.MERCHANT);
-				configManager.setConfiguration("salvagesack", "resetMerchant", false);
-				break;
-			case "resetAll":
-				resetAllData();
-				configManager.setConfiguration("salvagesack", "resetAll", false);
-				break;
-		}
-	}
 
 	private void resetShipwreckData(ShipwreckType type)
 	{
