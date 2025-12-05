@@ -3,6 +3,11 @@
    <configuration>
       <verify-metadata>true</verify-metadata>
       <verify-signatures>false</verify-signatures>
+      <trusted-artifacts>
+         <trust group="com.google.errorprone"/>
+         <trust group="com.google.code.gson"/>
+         <trust group="org.projectlombok"/>
+      </trusted-artifacts>
    </configuration>
    <components>
       <component group="aopalliance" name="aopalliance" version="1.0">
