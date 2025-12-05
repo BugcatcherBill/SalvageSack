@@ -42,13 +42,3 @@ https://oldschool.runescape.wiki/images/<ItemName>_detail.png
 ```
 
 Icons are cached in memory to avoid repeated network requests.
-
-## Future Enhancements
-
-1. **Wiki Integration**: Fetch drop rates from the OSRS Wiki API
-2. **Export/Import**: Allow users to export/import their data
-3. **Statistics View**: Show aggregate statistics across all shipwreck types
-4. **Reset Function**: Allow users to reset tracking data
-5. **Filters**: Filter items by rarity or drop rate
-6. **Item Lookup**: Use RuneLite's ItemManager to get accurate item IDs
-7. **Dry Streak Tracking**: Track longest dry streaks for rare items
