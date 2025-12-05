@@ -11,13 +11,24 @@ public class SalvageItem
 	private final int itemId;
 	private final String itemName;
 	private int dropCount;
-	private double expectedDropRate; // Expected rate from wiki (e.g., 0.1 for 10%)
+	private final double expectedDropRate; // Expected rate from wiki (e.g., 0.1 for 10%)
 
 	public SalvageItem(int itemId, String itemName, double expectedDropRate)
 	{
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.dropCount = 0;
+		this.expectedDropRate = expectedDropRate;
+	}
+
+	/**
+	 * Constructor for deserialization
+	 */
+	public SalvageItem(int itemId, String itemName, int dropCount, double expectedDropRate)
+	{
+		this.itemId = itemId;
+		this.itemName = itemName;
+		this.dropCount = dropCount;
 		this.expectedDropRate = expectedDropRate;
 	}
 

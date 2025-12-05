@@ -22,6 +22,16 @@ public class SalvageData
 	}
 
 	/**
+	 * Constructor for deserialization
+	 */
+	public SalvageData(ShipwreckType shipwreckType, int totalLoots, Map<Integer, SalvageItem> items)
+	{
+		this.shipwreckType = shipwreckType;
+		this.totalLoots = totalLoots;
+		this.items = items;
+	}
+
+	/**
 	 * Record a loot drop
 	 * @param itemId The item ID that was looted
 	 * @param itemName The item name

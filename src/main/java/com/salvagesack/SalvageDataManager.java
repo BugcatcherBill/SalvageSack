@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Handles persistence of salvage tracking data between sessions
@@ -121,19 +122,18 @@ public class SalvageDataManager
 
 		SalvageData toSalvageData(ShipwreckType type)
 		{
-			SalvageData data = new SalvageData(type);
-			data.setTotalLoots(totalLoots);
+			Map<Integer, SalvageItem> itemsMap = new ConcurrentHashMap<>();
 			
 			if (items != null)
 			{
 				for (Map.Entry<Integer, SalvageItemDto> entry : items.entrySet())
 				{
 					SalvageItem item = entry.getValue().toSalvageItem(entry.getKey());
-					data.getItems().put(entry.getKey(), item);
+					itemsMap.put(entry.getKey(), item);
 				}
 			}
 			
-			return data;
+			return new SalvageData(type, totalLoots, itemsMap);
 		}
 	}
 
@@ -157,9 +157,7 @@ public class SalvageDataManager
 
 		SalvageItem toSalvageItem(int itemId)
 		{
-			SalvageItem item = new SalvageItem(itemId, itemName, expectedDropRate);
-			item.setDropCount(dropCount);
-			return item;
+			return new SalvageItem(itemId, itemName, dropCount, expectedDropRate);
 		}
 	}
 }
