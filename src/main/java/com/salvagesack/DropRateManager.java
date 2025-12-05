@@ -17,11 +17,12 @@ import java.util.Map;
 public class DropRateManager
 {
 	private final Map<ShipwreckType, Map<String, Double>> dropRates = new HashMap<>();
-	private final Gson gson = new Gson();
+	private final Gson gson;
 	private final File userConfigFile;
 
-	public DropRateManager(File dataDirectory)
+	public DropRateManager(File dataDirectory, Gson gson)
 	{
+		this.gson = gson;
 		this.userConfigFile = new File(dataDirectory, "drop_rates.json");
 		loadDropRates();
 	}

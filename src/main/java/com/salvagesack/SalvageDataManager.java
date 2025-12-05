@@ -1,7 +1,6 @@
 package com.salvagesack;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -22,9 +21,9 @@ public class SalvageDataManager
 	private final Gson gson;
 	private final File dataFile;
 
-	public SalvageDataManager(File dataDirectory)
+	public SalvageDataManager(File dataDirectory, Gson gson)
 	{
-		this.gson = new GsonBuilder().setPrettyPrinting().create();
+		this.gson = gson;
 		this.dataFile = new File(dataDirectory, DATA_FILE);
 	}
 

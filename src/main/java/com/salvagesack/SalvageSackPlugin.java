@@ -1,5 +1,6 @@
 package com.salvagesack;
 
+import com.google.gson.Gson;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -47,6 +48,9 @@ public class SalvageSackPlugin extends Plugin
 	@Inject
 	private ItemManager itemManager;
 
+	@Inject
+	private Gson gson;
+
 	private SalvageSackPanel panel;
 	private NavigationButton navButton;
 	private SalvageDataManager dataManager;
@@ -80,10 +84,10 @@ public class SalvageSackPlugin extends Plugin
 				log.warn("Failed to create data directory: {}", dataDirectory.getAbsolutePath());
 			}
 		}
-		dataManager = new SalvageDataManager(dataDirectory);
-		
+		dataManager = new SalvageDataManager(dataDirectory, gson);
+
 		// Initialize drop rate manager
-		dropRateManager = new DropRateManager(dataDirectory);
+		dropRateManager = new DropRateManager(dataDirectory, gson);
 
 		// Load saved data
 		Map<ShipwreckType, SalvageData> loadedData = dataManager.loadData();
