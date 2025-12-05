@@ -113,8 +113,8 @@ The plugin includes expected drop rates sourced from the OSRS Wiki for all items
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/salvage-sack.git
-cd salvage-sack
+git clone https://github.com/BugcatcherBill/SalvageSack.git
+cd SalvageSack
 
 # Build the plugin
 ./gradlew build
