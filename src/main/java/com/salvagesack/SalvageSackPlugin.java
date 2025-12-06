@@ -51,6 +51,12 @@ public class SalvageSackPlugin extends Plugin
 	@Inject
 	private Gson gson;
 
+	@Inject
+	private SalvageSackConfig config;
+
+	@Inject
+	private ConfigManager configManager;
+
 	private SalvageSackPanel panel;
 	private NavigationButton navButton;
 	private SalvageDataManager dataManager;
@@ -98,8 +104,9 @@ public class SalvageSackPlugin extends Plugin
 		}
 
 		// Initialize panel
-		panel = new SalvageSackPanel(iconManager);
+		panel = new SalvageSackPanel(iconManager, config);
 		panel.setDropRateManager(dropRateManager);
+		panel.setConfigManager(configManager);
 		panel.setOnResetShipwreck(this::resetShipwreckData);
 		panel.setOnResetAll(this::resetAllData);
 		panel.updateData(salvageDataMap);

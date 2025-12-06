@@ -30,9 +30,11 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 - **Collapsible Sections**: Accordion-style panels for each shipwreck type
 - **Compact Design**: Sections collapse when empty, expand when they have data
 - **Auto-Sorted Sections**: Most recently updated shipwreck always appears at the top
+- **Flexible Sorting**: Sort items by name, current rate, expected rate, or quantity with ascending/descending options
 
 ### 💾 Persistent Data
 - All tracking data is automatically saved between sessions
+- Sort preferences are saved and restored automatically
 - Data stored locally in `.runelite/salvagesack/`
 
 ## Installation
@@ -61,6 +63,16 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 
 #### Header
 - Displays total number of sorts across all shipwreck types
+- **Sort Controls**: Dropdown menu and direction toggle for customizing item display order
+
+#### Sorting Options
+Items within each shipwreck section can be sorted by:
+- **Alphabetical**: Sort by item name (A-Z or Z-A)
+- **Current Rate**: Sort by your actual drop rate
+- **Expected Rate**: Sort by the wiki expected drop rate
+- **Quantity**: Sort by total quantity received
+
+Click the arrow button (↑/↓) to toggle between ascending and descending order. Your sort preference is automatically saved.
 
 #### Shipwreck Sections
 Each shipwreck type has a collapsible section showing:
