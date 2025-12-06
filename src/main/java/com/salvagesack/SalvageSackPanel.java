@@ -435,7 +435,8 @@ public class SalvageSackPanel extends PluginPanel
 	}
 
 	/**
-	 * Get sorted list of items based on config settings
+	 * Returns a sorted list of SalvageItems based on the current sort option and direction.
+	 * Sorting can be by alphabetical order, current drop rate, expected drop rate, or quantity.
 	 */
 	private List<SalvageItem> getSortedItems(SalvageData data)
 	{
