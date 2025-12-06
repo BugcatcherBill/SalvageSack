@@ -246,7 +246,8 @@ public class SalvageSackPlugin extends Plugin
 				int highAlchValue = getHighAlchValue(itemId);
 				if (highAlchValue > 0)
 				{
-					long bootyGained = (long) highAlchValue * quantity;
+					// Cast to long before multiplication to prevent overflow
+					long bootyGained = ((long) highAlchValue) * quantity;
 					boolean rankedUp = pirateRankData.addBooty(bootyGained);
 					
 					if (rankedUp)

@@ -34,6 +34,7 @@ public class PirateRankPanel extends JPanel
 	
 	private boolean showRankUpEffect = false;
 	private long rankUpEffectStartTime = 0;
+	private Timer rankUpEffectTimer = null;
 	private static final long RANK_UP_EFFECT_DURATION = 2000; // 2 seconds
 
 	public PirateRankPanel()
@@ -171,21 +172,27 @@ public class PirateRankPanel extends JPanel
 	 */
 	private void triggerRankUpEffect()
 	{
+		// Stop any existing timer to prevent memory leak
+		if (rankUpEffectTimer != null && rankUpEffectTimer.isRunning())
+		{
+			rankUpEffectTimer.stop();
+		}
+		
 		showRankUpEffect = true;
 		rankUpEffectStartTime = System.currentTimeMillis();
 		
 		// Start animation timer
-		Timer timer = new Timer(50, null);
-		timer.addActionListener(e -> {
+		rankUpEffectTimer = new Timer(50, null);
+		rankUpEffectTimer.addActionListener(e -> {
 			long elapsed = System.currentTimeMillis() - rankUpEffectStartTime;
 			if (elapsed >= RANK_UP_EFFECT_DURATION)
 			{
 				showRankUpEffect = false;
-				timer.stop();
+				rankUpEffectTimer.stop();
 			}
 			dialPanel.repaint();
 		});
-		timer.start();
+		rankUpEffectTimer.start();
 	}
 
 	/**
