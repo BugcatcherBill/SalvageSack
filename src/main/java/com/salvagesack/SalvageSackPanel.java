@@ -102,12 +102,15 @@ public class SalvageSackPanel extends PluginPanel
 		sortComboBox.setFocusable(false);
 		sortComboBox.addActionListener(e -> {
 			SortOption selected = (SortOption) sortComboBox.getSelectedItem();
-			currentSortOption = selected;
-			if (configManager != null)
+			if (selected != null)
 			{
-				configManager.setConfiguration(CONFIG_GROUP, "sortOption", selected);
+				currentSortOption = selected;
+				if (configManager != null)
+				{
+					configManager.setConfiguration(CONFIG_GROUP, "sortOption", selected);
+				}
+				rebuild();
 			}
-			rebuild();
 		});
 		
 		// Sort direction button
