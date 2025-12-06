@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 @Slf4j
 public class SalvageSackPanel extends PluginPanel
 {
+	private static final String CONFIG_GROUP = "salvagesack";
 	private static final Color LUCK_GOOD = new Color(0, 200, 83);      // Green - lucky
 	private static final Color LUCK_NEUTRAL = new Color(255, 214, 0); // Yellow - expected
 	private static final Color LUCK_BAD = new Color(255, 68, 68);     // Red - unlucky
@@ -104,7 +105,7 @@ public class SalvageSackPanel extends PluginPanel
 			currentSortOption = selected;
 			if (configManager != null)
 			{
-				configManager.setConfiguration("salvagesack", "sortOption", selected);
+				configManager.setConfiguration(CONFIG_GROUP, "sortOption", selected);
 			}
 			rebuild();
 		});
@@ -124,15 +125,16 @@ public class SalvageSackPanel extends PluginPanel
 			sortDirectionButton.setToolTipText(currentSortDescending ? "Descending" : "Ascending");
 			if (configManager != null)
 			{
-				configManager.setConfiguration("salvagesack", "sortDescending", currentSortDescending);
+				configManager.setConfiguration(CONFIG_GROUP, "sortDescending", currentSortDescending);
 			}
 			rebuild();
 		});
 		
-		sortPanel.add(new JLabel("Sort: ") {{
-			setForeground(Color.LIGHT_GRAY);
-			setFont(new Font("Arial", Font.PLAIN, 9));
-		}});
+		JLabel sortLabel = new JLabel("Sort: ");
+		sortLabel.setForeground(Color.LIGHT_GRAY);
+		sortLabel.setFont(new Font("Arial", Font.PLAIN, 9));
+		
+		sortPanel.add(sortLabel);
 		sortPanel.add(sortComboBox);
 		sortPanel.add(sortDirectionButton);
 		
