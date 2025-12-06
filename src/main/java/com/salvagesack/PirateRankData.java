@@ -16,7 +16,7 @@ public class PirateRankData
 	public PirateRankData()
 	{
 		this.totalBooty = 0;
-		this.currentRank = PirateRank.CASTAWAY;
+		this.currentRank = PirateRank.RANK_1;
 		this.previousRank = null;
 		this.justRankedUp = false;
 	}
