@@ -130,7 +130,7 @@ public enum PirateRank
 	RANK_97(1988474204, "Supreme", "Highest peak"),
 	RANK_98(2040662644, "Pinnacle", "Apex achieved"),
 	RANK_99(2093664398, "Zenith", "Maximum height"),
-	RANK_100(Integer.MAX_VALUE, "Max Cash Stack", "2,147,483,647 GP");
+	RANK_100(Integer.MAX_VALUE, "King of the Pirates", "2,147,483,647 GP");
 
 	private final int bootyRequired;
 	private final String displayName;
