@@ -72,34 +72,69 @@ public class SalvageSackPanel extends PluginPanel
 
 		JPanel titlePanel = new JPanel(new BorderLayout());
 		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		titlePanel.setBorder(new EmptyBorder(8, 10, 8, 10));
+		titlePanel.setBorder(new EmptyBorder(10, 12, 10, 12));
 
-		// Left side: Title
-		JLabel title = new JLabel("Salvage Sack");
-		title.setForeground(Color.WHITE);
-		title.setFont(new Font("Arial", Font.BOLD, 16));
+		// Left side: Icon
+		JLabel iconLabel = new JLabel();
+		try
+		{
+			BufferedImage iconImage = net.runelite.client.util.ImageUtil.loadImageResource(getClass(), "/icon.png");
+			if (iconImage != null)
+			{
+				// Scale icon to 24x24 for header
+				Image scaledIcon = iconImage.getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+				iconLabel.setIcon(new ImageIcon(scaledIcon));
+			}
+		}
+		catch (Exception e)
+		{
+			// Fallback: use text if icon fails to load
+			iconLabel.setText("SS");
+			iconLabel.setForeground(Color.WHITE);
+			iconLabel.setFont(new Font("Arial", Font.BOLD, 14));
+		}
+		iconLabel.setBorder(new EmptyBorder(0, 0, 0, 10));
 
-		// Right side: Total and sort controls
-		JPanel rightPanel = new JPanel();
-		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-		rightPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		// Center/Right side: Stats and controls organized in a grid
+		JPanel infoPanel = new JPanel(new GridBagLayout());
+		infoPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 8, 0, 0);
 		
-		totalOpensLabel = new JLabel("0 Sorts");
-		totalOpensLabel.setForeground(Color.LIGHT_GRAY);
-		totalOpensLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-		totalOpensLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		// Total salvage label
+		totalOpensLabel = new JLabel("0 Total Salvage Sorted");
+		totalOpensLabel.setForeground(Color.WHITE);
+		totalOpensLabel.setFont(new Font("Arial", Font.BOLD, 11));
 		
-		// Sort controls panel
-		JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-		sortPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 3;
+		gbc.insets = new Insets(0, 0, 4, 0);
+		infoPanel.add(totalOpensLabel, gbc);
+		
+		// Item ordering label
+		JLabel orderingLabel = new JLabel("Item ordering:");
+		orderingLabel.setForeground(Color.LIGHT_GRAY);
+		orderingLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+		
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.insets = new Insets(0, 0, 0, 4);
+		infoPanel.add(orderingLabel, gbc);
 		
 		// Sort dropdown
 		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
 		sortComboBox.setSelectedItem(currentSortOption);
-		sortComboBox.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		sortComboBox.setForeground(Color.LIGHT_GRAY);
-		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 9));
+		sortComboBox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		sortComboBox.setForeground(Color.WHITE);
+		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 10));
 		sortComboBox.setFocusable(false);
+		sortComboBox.setBorder(new CompoundBorder(
+			new LineBorder(ColorScheme.MEDIUM_GRAY_COLOR, 1),
+			new EmptyBorder(2, 4, 2, 4)
+		));
 		sortComboBox.addActionListener(e -> {
 			SortOption selected = (SortOption) sortComboBox.getSelectedItem();
 			if (selected != null)
@@ -113,14 +148,19 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		});
 		
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.insets = new Insets(0, 0, 0, 4);
+		infoPanel.add(sortComboBox, gbc);
+		
 		// Sort direction button
 		JButton sortDirectionButton = new JButton(currentSortDescending ? "↓" : "↑");
-		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 12));
-		sortDirectionButton.setPreferredSize(new Dimension(24, 20));
-		sortDirectionButton.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		sortDirectionButton.setForeground(Color.LIGHT_GRAY);
+		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 14));
+		sortDirectionButton.setPreferredSize(new Dimension(28, 24));
+		sortDirectionButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		sortDirectionButton.setForeground(Color.WHITE);
 		sortDirectionButton.setFocusable(false);
-		sortDirectionButton.setBorderPainted(false);
+		sortDirectionButton.setBorder(new LineBorder(ColorScheme.MEDIUM_GRAY_COLOR, 1));
 		sortDirectionButton.setToolTipText(currentSortDescending ? "Descending" : "Ascending");
 		sortDirectionButton.addActionListener(e -> {
 			currentSortDescending = !currentSortDescending;
@@ -132,21 +172,26 @@ public class SalvageSackPanel extends PluginPanel
 			}
 			rebuild();
 		});
+		// Add hover effect
+		sortDirectionButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				sortDirectionButton.setBackground(ColorScheme.DARK_GRAY_HOVER_COLOR);
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				sortDirectionButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+			}
+		});
 		
-		JLabel sortLabel = new JLabel("Sort: ");
-		sortLabel.setForeground(Color.LIGHT_GRAY);
-		sortLabel.setFont(new Font("Arial", Font.PLAIN, 9));
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		infoPanel.add(sortDirectionButton, gbc);
 		
-		sortPanel.add(sortLabel);
-		sortPanel.add(sortComboBox);
-		sortPanel.add(sortDirectionButton);
-		
-		rightPanel.add(totalOpensLabel);
-		rightPanel.add(Box.createVerticalStrut(2));
-		rightPanel.add(sortPanel);
-		
-		titlePanel.add(title, BorderLayout.WEST);
-		titlePanel.add(rightPanel, BorderLayout.EAST);
+		titlePanel.add(iconLabel, BorderLayout.WEST);
+		titlePanel.add(infoPanel, BorderLayout.EAST);
 
 		add(titlePanel, BorderLayout.NORTH);
 
@@ -203,7 +248,7 @@ public class SalvageSackPanel extends PluginPanel
 					totalOpens += data.getTotalLoots();
 				}
 			}
-			totalOpensLabel.setText(totalOpens + "  Total Sorts");
+			totalOpensLabel.setText(totalOpens + " Total Salvage Sorted");
 
 			if (salvageDataMap == null || salvageDataMap.isEmpty())
 			{
