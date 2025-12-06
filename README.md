@@ -9,7 +9,7 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 ## Features
 
 ### 🏴‍☠️ Pirate Rank Microgame
-- **50 Unique Ranks**: Progress from "Castaway" to "Eternal Legend"
+- **50 Unique Ranks**: Progress from "Castaway" to "Wise Old Pirate"
 - **Booty-Based Progression**: Earn ranks based on the high alchemy value of salvaged items
 - **Circular Dial Display**: Visual rank indicator showing current rank and progress
 - **Progress Bar**: Track your advancement toward the next rank
@@ -81,7 +81,7 @@ The pirate rank panel appears at the top of the interface and shows:
 
 **Rank Progression**:
 - Ranks are earned by accumulating "booty" (high alch value of salvaged items)
-- 50 ranks total, from Castaway (starting rank) to Eternal Legend (max rank)
+- 50 ranks total, from Castaway (starting rank) to Wise Old Pirate (max rank)
 - Rank-ups trigger a golden glow effect on the dial
 - Your rank persists between sessions
 
