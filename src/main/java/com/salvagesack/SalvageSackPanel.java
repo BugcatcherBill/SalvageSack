@@ -44,6 +44,7 @@ public class SalvageSackPanel extends PluginPanel
 	private final SalvageSackConfig config;
 	private final Map<ShipwreckType, Boolean> expandedState = new HashMap<>();
 	private final JLabel totalOpensLabel;
+	private final JPanel titlePanel;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
 	private SortOption currentSortOption;
 	private boolean currentSortDescending;
@@ -74,12 +75,7 @@ public class SalvageSackPanel extends PluginPanel
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
-		// Title panel with center-aligned content
-		JPanel titlePanel = new JPanel();
-		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
-		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
+		// Create title panel components that will be added to contentPanel in rebuild()
 		// Total salvage label - center aligned
 		totalOpensLabel = new JLabel("0 Total Salvage Sorted");
 		totalOpensLabel.setForeground(Color.WHITE);
@@ -150,11 +146,15 @@ public class SalvageSackPanel extends PluginPanel
 		sortControlsPanel.add(sortComboBox);
 		sortControlsPanel.add(sortDirectionButton);
 		
+		// Create title panel with header components (will be added in rebuild)
+		titlePanel = new JPanel();
+		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		titlePanel.add(totalOpensLabel);
 		titlePanel.add(Box.createVerticalStrut(5));
 		titlePanel.add(sortControlsPanel);
-
-		add(titlePanel, BorderLayout.NORTH);
+		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -217,6 +217,10 @@ public class SalvageSackPanel extends PluginPanel
 				contentPanel.add(pirateRankPanel);
 				contentPanel.add(Box.createVerticalStrut(10));
 			}
+
+			// Add title panel (total salvage and sort controls) below pirate rank panel
+			contentPanel.add(titlePanel);
+			contentPanel.add(Box.createVerticalStrut(10));
 
 			// Calculate total opens across all shipwreck types
 			int totalOpens = 0;
