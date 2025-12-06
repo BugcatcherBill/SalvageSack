@@ -17,10 +17,10 @@ import java.util.Locale;
 public class PirateRankPanel extends JPanel
 {
 	private static final int DIAL_SIZE = 120;
-	private static final Color PROGRESS_FILL = new Color(218, 165, 32); // Gold
+	private static final Color PROGRESS_FILL = new Color(218, 165, 32); // Gold (like RuneScape gold coins)
 	private static final Color PROGRESS_BACKGROUND = new Color(60, 60, 60);
-	private static final Color BORDER_COLOR = new Color(139, 69, 19); // Brown
-	private static final Color RANK_UP_COLOR = new Color(255, 215, 0); // Bright gold
+	private static final Color BORDER_COLOR = new Color(139, 69, 19); // Brown (like treasure chest wood)
+	private static final Color RANK_UP_COLOR = new Color(255, 215, 0); // Bright gold (level up glow)
 
 	@Setter
 	private PirateRankData rankData;

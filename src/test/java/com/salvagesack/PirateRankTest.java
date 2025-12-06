@@ -10,7 +10,7 @@ public class PirateRankTest
 	{
 		// Test first and last ranks
 		assertEquals("Castaway", PirateRank.CASTAWAY.getDisplayName());
-		assertEquals("Eternal Legend", PirateRank.ETERNAL_LEGEND.getDisplayName());
+		assertEquals("Wise Old Pirate", PirateRank.WISE_OLD_PIRATE.getDisplayName());
 		
 		// Verify we have 50 ranks
 		assertEquals(50, PirateRank.values().length);
@@ -45,8 +45,8 @@ public class PirateRankTest
 		assertEquals(PirateRank.PIRATE_EMPEROR, PirateRank.getRankForBooty(1000000));
 		
 		// Maximum rank
-		assertEquals(PirateRank.ETERNAL_LEGEND, PirateRank.getRankForBooty(10000000));
-		assertEquals(PirateRank.ETERNAL_LEGEND, PirateRank.getRankForBooty(999999999));
+		assertEquals(PirateRank.WISE_OLD_PIRATE, PirateRank.getRankForBooty(10000000));
+		assertEquals(PirateRank.WISE_OLD_PIRATE, PirateRank.getRankForBooty(999999999));
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class PirateRankTest
 		assertEquals(PirateRank.QUARTERMASTER, PirateRank.SAILING_MASTER.getNextRank());
 		
 		// Last rank should have no next rank
-		assertNull(PirateRank.ETERNAL_LEGEND.getNextRank());
+		assertNull(PirateRank.WISE_OLD_PIRATE.getNextRank());
 	}
 
 	@Test
@@ -78,8 +78,8 @@ public class PirateRankTest
 		assertEquals(1.0, PirateRank.CASTAWAY.getProgressToNextRank(2000), 0.001);
 		
 		// Max rank should always be 100% progress
-		assertEquals(1.0, PirateRank.ETERNAL_LEGEND.getProgressToNextRank(10000000), 0.001);
-		assertEquals(1.0, PirateRank.ETERNAL_LEGEND.getProgressToNextRank(999999999), 0.001);
+		assertEquals(1.0, PirateRank.WISE_OLD_PIRATE.getProgressToNextRank(10000000), 0.001);
+		assertEquals(1.0, PirateRank.WISE_OLD_PIRATE.getProgressToNextRank(999999999), 0.001);
 	}
 
 	@Test
@@ -100,6 +100,6 @@ public class PirateRankTest
 	{
 		assertEquals("Castaway", PirateRank.CASTAWAY.toString());
 		assertEquals("Pirate Lord", PirateRank.PIRATE_LORD.toString());
-		assertEquals("Eternal Legend", PirateRank.ETERNAL_LEGEND.toString());
+		assertEquals("Wise Old Pirate", PirateRank.WISE_OLD_PIRATE.toString());
 	}
 }

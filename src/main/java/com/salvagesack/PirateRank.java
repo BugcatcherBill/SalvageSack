@@ -11,67 +11,67 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PirateRank
 {
-	// Beginner ranks (0-100k)
-	CASTAWAY(0, "Castaway", "Cast ashore with nothing"),
-	DECK_SWABBER(2000, "Deck Swabber", "The lowest of the low"),
-	CABIN_BOY(4000, "Cabin Boy", "Learning the ropes"),
-	POWDER_MONKEY(6000, "Powder Monkey", "Handling explosives"),
-	SHIPS_COOK(8000, "Ship's Cook", "Feeding the crew"),
+	// Beginner ranks (0-100k) - Starting your journey
+	CASTAWAY(0, "Castaway", "Washed up in Lumbridge"),
+	DECK_SWABBER(2000, "Deck Swabber", "Cleaning barnacles at Port Sarim"),
+	CABIN_BOY(4000, "Cabin Boy", "Fetching grog for Bill Teach"),
+	POWDER_MONKEY(6000, "Powder Monkey", "Handling dwarf cannons"),
+	SHIPS_COOK(8000, "Ship's Cook", "Burnt fish specialist"),
 	
-	// Junior ranks (10k-50k)
-	ABLE_SEAMAN(10000, "Able Seaman", "Competent sailor"),
-	RIGGER(15000, "Rigger", "Master of the rigging"),
-	LOOKOUT(20000, "Lookout", "Eagle-eyed watcher"),
-	NAVIGATOR(25000, "Navigator", "Charting the course"),
-	GUNNER(30000, "Gunner", "Manning the cannons"),
-	BOSUN(35000, "Bosun", "Ship's supervisor"),
-	MASTER_GUNNER(40000, "Master Gunner", "Artillery expert"),
-	SAILING_MASTER(45000, "Sailing Master", "Navigation specialist"),
+	// Junior ranks (10k-50k) - Port Sarim connections
+	ABLE_SEAMAN(10000, "Able Seaman", "Redberry pie approved"),
+	RIGGER(15000, "Rigger", "Master of agility shortcuts"),
+	LOOKOUT(20000, "Lookout", "Spying from Eagles' Peak"),
+	NAVIGATOR(25000, "Navigator", "Reading ancient charts"),
+	GUNNER(30000, "Gunner", "Wannabe Cannonballer"),
+	BOSUN(35000, "Bosun", "Brimhaven's finest"),
+	MASTER_GUNNER(40000, "Master Gunner", "Artisan of explosions"),
+	SAILING_MASTER(45000, "Sailing Master", "Charting the Arc"),
 	
-	// Intermediate ranks (50k-150k)
-	QUARTERMASTER(50000, "Quartermaster", "Supply master"),
-	CARPENTER(60000, "Carpenter", "Ship's builder"),
-	SURGEON(70000, "Surgeon", "Sawbones of the sea"),
-	FIRST_MATE(80000, "First Mate", "Captain's right hand"),
-	HELMSMAN(90000, "Helmsman", "Master of the wheel"),
-	PRIVATEER(100000, "Privateer", "Licensed plunderer"),
-	BUCCANEER(120000, "Buccaneer", "Caribbean raider"),
-	CORSAIR(140000, "Corsair", "Mediterranean menace"),
+	// Intermediate ranks (50k-150k) - Pirate legends and locations
+	QUARTERMASTER(50000, "Quartermaster", "Trading at Mos Le'Harmless"),
+	CARPENTER(60000, "Carpenter", "Fixing up your POH ship"),
+	SURGEON(70000, "Surgeon", "4 HP healer"),
+	FIRST_MATE(80000, "First Mate", "Bill Teach's rival"),
+	HELMSMAN(90000, "Helmsman", "Steering through Crandor"),
+	PRIVATEER(100000, "Privateer", "Royal charter holder"),
+	BUCCANEER(120000, "Buccaneer", "Scourge of Karamja"),
+	CORSAIR(140000, "Corsair", "Terror of Corsair Cove"),
 	
-	// Advanced ranks (150k-500k)
-	SEA_WOLF(150000, "Sea Wolf", "Feared predator"),
-	MARAUDER(175000, "Marauder", "Ruthless raider"),
-	RAIDER(200000, "Raider", "Coastal terror"),
-	PLUNDERER(225000, "Plunderer", "Master looter"),
-	FREEBOOTER(250000, "Freebooter", "Independent pirate"),
-	BRIGAND(275000, "Brigand", "Lawless bandit"),
-	SEA_REAVER(300000, "Sea Reaver", "Ocean pillager"),
-	PIRATE_LORD(350000, "Pirate Lord", "Regional power"),
-	CUTTHROAT_CAPTAIN(400000, "Cutthroat Captain", "Merciless leader"),
-	SCOURGE(450000, "Scourge", "Naval nightmare"),
+	// Advanced ranks (150k-500k) - Wilderness pirates and dangers
+	SEA_WOLF(150000, "Sea Wolf", "Mage Arena II survivor"),
+	MARAUDER(175000, "Marauder", "Fossil Island raider"),
+	RAIDER(200000, "Raider", "Looting Barrows chests"),
+	PLUNDERER(225000, "Plunderer", "Pyramid Plunder expert"),
+	FREEBOOTER(250000, "Freebooter", "Answerable to none"),
+	ROCK_CRAB_CRUSHER(275000, "Rock Crab Crusher", "Slayer of Waterbirth"),
+	SEA_REAVER(300000, "Sea Reaver", "Fremennik approved"),
+	PIRATE_LORD(350000, "Pirate Lord", "Ruler of Braindeath Island"),
+	RABID_JACK_RIVAL(400000, "Rabid Jack Rival", "Worthy adversary"),
+	SCOURGE(450000, "Scourge of the Seas", "Feared across Gielinor"),
 	
-	// Elite ranks (500k-2M)
-	DREAD_CAPTAIN(500000, "Dread Captain", "Feared commander"),
-	SKULL_KING(600000, "Skull King", "Death's ambassador"),
-	TREASURE_BARON(700000, "Treasure Baron", "Wealthy plunderer"),
-	FLEET_ADMIRAL(800000, "Fleet Admiral", "Multi-ship commander"),
-	SEA_TYRANT(900000, "Sea Tyrant", "Ocean dictator"),
-	PIRATE_EMPEROR(1000000, "Pirate Emperor", "Ruler of pirates"),
-	LEGENDARY_CORSAIR(1200000, "Legendary Corsair", "Living legend"),
-	KRAKEN_MASTER(1400000, "Kraken Master", "Beast tamer"),
-	NEPTUNES_NIGHTMARE(1600000, "Neptune's Nightmare", "God's enemy"),
-	LEVIATHAN_LORD(1800000, "Leviathan Lord", "Sea monster"),
+	// Elite ranks (500k-2M) - Legendary bosses and quests
+	DREAD_CAPTAIN(500000, "Dread Captain", "Haunting the seven seas"),
+	SKELETAL_ADMIRAL(600000, "Skeletal Admiral", "Undead fleet commander"),
+	TREASURE_BARON(700000, "Treasure Baron", "Casket hoarder"),
+	FLEET_ADMIRAL(800000, "Fleet Admiral", "Leading the armada"),
+	ECTOFUNTUS_DEVOTEE(900000, "Ectofuntus Devotee", "Worshipping for booty"),
+	PIRATE_EMPEROR(1000000, "Pirate Emperor", "Crown of the ocean"),
+	BARRELCHEST_SLAYER(1200000, "Barrelchest Slayer", "Defeated the legend"),
+	KRAKEN_TAMER(1400000, "Kraken Tamer", "87 Slayer achieved"),
+	JORMUNGAND_HUNTER(1600000, "Jormungand Hunter", "Snake slayer supreme"),
+	LEVIATHAN_LORD(1800000, "Leviathan Lord", "DT2 conqueror"),
 	
-	// Legendary ranks (2M+)
-	IMMORTAL_CAPTAIN(2000000, "Immortal Captain", "Deathless legend"),
-	GHOST_ADMIRAL(2500000, "Ghost Admiral", "Phantom fleet commander"),
-	STORM_BRINGER(3000000, "Storm Bringer", "Weather controller"),
-	CURSE_BEARER(3500000, "Curse Bearer", "Eternally damned"),
-	KINGS_BANE(4000000, "King's Bane", "Crown's nightmare"),
-	OCEAN_SOVEREIGN(5000000, "Ocean Sovereign", "Master of seas"),
-	DAVY_JONES(6000000, "Davy Jones", "Locker keeper"),
-	POSEIDON_SLAYER(7500000, "Poseidon Slayer", "God killer"),
-	ETERNAL_LEGEND(10000000, "Eternal Legend", "Forever remembered");
+	// Legendary ranks (2M+) - God-tier OSRS references
+	GHOST_CAPTAIN(2000000, "Ghost Captain", "Ectoplasm incarnate"),
+	PHANTOM_ADMIRAL(2500000, "Phantom Admiral", "Port Phasmatys legend"),
+	TEMPOROS_TAMER(3000000, "Temporos Tamer", "Storm god subdued"),
+	MONKEY_MADNESS(3500000, "Monkey Madness", "Ape Atoll survivor"),
+	PIRATE_PETE_RIVAL(4000000, "Pirate Pete Rival", "Rum Deal champion"),
+	OCEAN_SOVEREIGN(5000000, "Ocean Sovereign", "Master of all waters"),
+	JONES_LOCKER_KEEPER(6000000, "Jones' Locker Keeper", "Guardian of the deep"),
+	DRAGON_SLAYER(7500000, "Dragon Slayer", "Elvarg's bane"),
+	WISE_OLD_PIRATE(10000000, "Wise Old Pirate", "Bank standing legend");
 
 	private final int bootyRequired;
 	private final String displayName;

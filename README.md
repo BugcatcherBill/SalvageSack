@@ -8,6 +8,15 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 
 ## Features
 
+### 🏴‍☠️ Pirate Rank Microgame
+- **50 Unique Ranks**: Progress from "Castaway" to "Eternal Legend"
+- **Booty-Based Progression**: Earn ranks based on the high alchemy value of salvaged items
+- **Circular Dial Display**: Visual rank indicator showing current rank and progress
+- **Progress Bar**: Track your advancement toward the next rank
+- **Rank-Up Effects**: Satisfying visual effects when you achieve a new rank
+- **Persistent Progress**: Your rank and booty are saved between sessions
+- **Configurable**: Enable or disable the microgame in plugin settings
+
 ### 📊 Comprehensive Tracking
 - **Track by Shipwreck Type**: Separate tracking for all 8 shipwreck types:
   - Small shipwrecks (Small salvage)
@@ -60,6 +69,21 @@ A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sai
 4. **View Statistics**: The panel automatically updates with your loot data
 
 ### Reading the Panel
+
+#### Pirate Rank Display (if enabled)
+The pirate rank panel appears at the top of the interface and shows:
+- **Circular Dial**: Displays your current rank number with a progress arc showing advancement to next rank
+- **Rank Title**: Your current pirate rank name (e.g., "Quartermaster", "Pirate Lord")
+- **Description**: Flavor text describing your rank
+- **Total Booty**: Accumulated high alchemy value from all salvaged items
+- **Progress Bar**: Visual indicator of progress toward the next rank
+- **Progress Label**: Exact amount of booty needed for the next rank
+
+**Rank Progression**:
+- Ranks are earned by accumulating "booty" (high alch value of salvaged items)
+- 50 ranks total, from Castaway (starting rank) to Eternal Legend (max rank)
+- Rank-ups trigger a golden glow effect on the dial
+- Your rank persists between sessions
 
 #### Header
 - Displays total number of sorts across all shipwreck types
@@ -120,6 +144,7 @@ The plugin includes expected drop rates sourced from the OSRS Wiki for all items
 - **Files**:
   - `salvage-data.json` - Your tracking data
   - `drop_rates.json` - Expected drop rate configuration
+  - `pirate_rank.json` - Your pirate rank progression data
 
 ### Building from Source
 
@@ -148,6 +173,12 @@ A: Yes, you can edit `drop_rates.json` in the salvagesack folder. The rates are 
 
 **Q: How do I reset just one shipwreck type?**
 A: Right-click on the shipwreck section header in the panel and select "Reset [Shipwreck] Data"
+
+**Q: How do I disable the pirate rank display?**
+A: Open the plugin configuration (right-click the wrench icon > "Salvage Sack") and uncheck "Enable Pirate Ranks"
+
+**Q: What is "booty" and how is it calculated?**
+A: Booty is the high alchemy value of items you salvage. Higher value items contribute more to your rank progression.
 
 ## Contributing
 

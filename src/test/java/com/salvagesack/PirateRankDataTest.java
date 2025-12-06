@@ -123,14 +123,14 @@ public class PirateRankDataTest
 		// Add enough to reach max rank
 		data.addBooty(10000000);
 		
-		assertEquals(PirateRank.ETERNAL_LEGEND, data.getCurrentRank());
+		assertEquals(PirateRank.WISE_OLD_PIRATE, data.getCurrentRank());
 		assertEquals(1.0, data.getProgressToNextRank(), 0.001);
 		assertEquals(0, data.getBootyNeededForNextRank());
 		
 		// Adding more booty shouldn't rank up
 		boolean rankedUp = data.addBooty(1000000);
 		assertFalse(rankedUp);
-		assertEquals(PirateRank.ETERNAL_LEGEND, data.getCurrentRank());
+		assertEquals(PirateRank.WISE_OLD_PIRATE, data.getCurrentRank());
 	}
 
 	@Test
