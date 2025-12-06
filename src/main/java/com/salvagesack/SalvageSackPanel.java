@@ -22,6 +22,12 @@ import java.util.function.Consumer;
 
 /**
  * Panel that displays salvage tracking information
+ * <p>
+ * The panel includes sorting controls that allow users to organize items
+ * by different criteria including alphabetical order, current drop rate,
+ * expected drop rate, and quantity. Sort direction can be toggled between
+ * ascending and descending.
+ * </p>
  */
 @Slf4j
 public class SalvageSackPanel extends PluginPanel
@@ -119,7 +125,10 @@ public class SalvageSackPanel extends PluginPanel
 			rebuild();
 		});
 		
-		sortPanel.add(new JLabel("Sort: "));
+		sortPanel.add(new JLabel("Sort: ") {{
+			setForeground(Color.LIGHT_GRAY);
+			setFont(new Font("Arial", Font.PLAIN, 9));
+		}});
 		sortPanel.add(sortComboBox);
 		sortPanel.add(sortDirectionButton);
 		
