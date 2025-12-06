@@ -44,6 +44,8 @@ public class SalvageSackPanel extends PluginPanel
 	private final Map<ShipwreckType, Boolean> expandedState = new HashMap<>();
 	private final JLabel totalOpensLabel;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
+	private SortOption currentSortOption;
+	private boolean currentSortDescending;
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
@@ -62,6 +64,8 @@ public class SalvageSackPanel extends PluginPanel
 		super(false);
 		this.iconManager = iconManager;
 		this.config = config;
+		this.currentSortOption = config.sortOption();
+		this.currentSortDescending = config.sortDescending();
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
@@ -90,36 +94,37 @@ public class SalvageSackPanel extends PluginPanel
 		
 		// Sort dropdown
 		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
-		sortComboBox.setSelectedItem(config.sortOption());
+		sortComboBox.setSelectedItem(currentSortOption);
 		sortComboBox.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		sortComboBox.setForeground(Color.LIGHT_GRAY);
 		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 9));
 		sortComboBox.setFocusable(false);
 		sortComboBox.addActionListener(e -> {
+			SortOption selected = (SortOption) sortComboBox.getSelectedItem();
+			currentSortOption = selected;
 			if (configManager != null)
 			{
-				SortOption selected = (SortOption) sortComboBox.getSelectedItem();
 				configManager.setConfiguration("salvagesack", "sortOption", selected);
 			}
 			rebuild();
 		});
 		
 		// Sort direction button
-		JButton sortDirectionButton = new JButton(config.sortDescending() ? "↓" : "↑");
+		JButton sortDirectionButton = new JButton(currentSortDescending ? "↓" : "↑");
 		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 12));
 		sortDirectionButton.setPreferredSize(new Dimension(24, 20));
 		sortDirectionButton.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		sortDirectionButton.setForeground(Color.LIGHT_GRAY);
 		sortDirectionButton.setFocusable(false);
 		sortDirectionButton.setBorderPainted(false);
-		sortDirectionButton.setToolTipText(config.sortDescending() ? "Descending" : "Ascending");
+		sortDirectionButton.setToolTipText(currentSortDescending ? "Descending" : "Ascending");
 		sortDirectionButton.addActionListener(e -> {
-			boolean newDescending = !config.sortDescending();
-			sortDirectionButton.setText(newDescending ? "↓" : "↑");
-			sortDirectionButton.setToolTipText(newDescending ? "Descending" : "Ascending");
+			currentSortDescending = !currentSortDescending;
+			sortDirectionButton.setText(currentSortDescending ? "↓" : "↑");
+			sortDirectionButton.setToolTipText(currentSortDescending ? "Descending" : "Ascending");
 			if (configManager != null)
 			{
-				configManager.setConfiguration("salvagesack", "sortDescending", newDescending);
+				configManager.setConfiguration("salvagesack", "sortDescending", currentSortDescending);
 			}
 			rebuild();
 		});
@@ -418,12 +423,9 @@ public class SalvageSackPanel extends PluginPanel
 	{
 		List<SalvageItem> items = new ArrayList<>(data.getItems().values());
 		
-		SortOption sortOption = config != null ? config.sortOption() : SortOption.ALPHABETICAL;
-		boolean descending = config != null && config.sortDescending();
-		
 		Comparator<SalvageItem> comparator;
 		
-		switch (sortOption)
+		switch (currentSortOption)
 		{
 			case ALPHABETICAL:
 				comparator = Comparator.comparing(SalvageItem::getItemName);
@@ -446,7 +448,7 @@ public class SalvageSackPanel extends PluginPanel
 				break;
 		}
 		
-		if (descending)
+		if (currentSortDescending)
 		{
 			comparator = comparator.reversed();
 		}
