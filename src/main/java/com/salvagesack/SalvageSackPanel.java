@@ -1,6 +1,7 @@
 package com.salvagesack;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
@@ -21,10 +22,17 @@ import java.util.function.Consumer;
 
 /**
  * Panel that displays salvage tracking information
+ * <p>
+ * The panel includes sorting controls that allow users to organize items
+ * by different criteria including alphabetical order, current drop rate,
+ * expected drop rate, and quantity. Sort direction can be toggled between
+ * ascending and descending.
+ * </p>
  */
 @Slf4j
 public class SalvageSackPanel extends PluginPanel
 {
+	private static final String CONFIG_GROUP = "salvagesack";
 	private static final Color LUCK_GOOD = new Color(0, 200, 83);      // Green - lucky
 	private static final Color LUCK_NEUTRAL = new Color(255, 214, 0); // Yellow - expected
 	private static final Color LUCK_BAD = new Color(255, 68, 68);     // Red - unlucky
@@ -33,9 +41,12 @@ public class SalvageSackPanel extends PluginPanel
 
 	private final JPanel contentPanel;
 	private final ItemIconManager iconManager;
+	private final SalvageSackConfig config;
 	private final Map<ShipwreckType, Boolean> expandedState = new HashMap<>();
 	private final JLabel totalOpensLabel;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
+	private SortOption currentSortOption;
+	private boolean currentSortDescending;
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
@@ -46,26 +57,109 @@ public class SalvageSackPanel extends PluginPanel
 	@lombok.Setter
 	private Runnable onResetAll;
 
-	public SalvageSackPanel(ItemIconManager iconManager)
+	@lombok.Setter
+	private ConfigManager configManager;
+
+	public SalvageSackPanel(ItemIconManager iconManager, SalvageSackConfig config)
 	{
 		super(false);
 		this.iconManager = iconManager;
+		this.config = config;
+		this.currentSortOption = config.sortOption();
+		this.currentSortDescending = config.sortDescending();
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
 		JPanel titlePanel = new JPanel(new BorderLayout());
 		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		titlePanel.setBorder(new EmptyBorder(8, 10, 8, 10));
+		titlePanel.setBorder(new EmptyBorder(10, 12, 10, 12));
 
-		JLabel title = new JLabel("Salvage Sack");
-		title.setForeground(Color.WHITE);
-		title.setFont(new Font("Arial", Font.BOLD, 16));
-		titlePanel.add(title, BorderLayout.WEST);
-
-		totalOpensLabel = new JLabel("0 Sorts");
-		totalOpensLabel.setForeground(Color.LIGHT_GRAY);
-		totalOpensLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-		titlePanel.add(totalOpensLabel, BorderLayout.EAST);
+		// Right side: Stats and controls organized in a grid
+		JPanel infoPanel = new JPanel(new GridBagLayout());
+		infoPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 8, 0, 0);
+		
+		// Total salvage label
+		totalOpensLabel = new JLabel("0 Total Salvage Sorted");
+		totalOpensLabel.setForeground(Color.WHITE);
+		totalOpensLabel.setFont(new Font("Arial", Font.BOLD, 11));
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(0, 0, 4, 0);
+		infoPanel.add(totalOpensLabel, gbc);
+		
+		// Sort dropdown
+		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
+		sortComboBox.setSelectedItem(currentSortOption);
+		sortComboBox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		sortComboBox.setForeground(Color.WHITE);
+		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 10));
+		sortComboBox.setFocusable(false);
+		sortComboBox.setBorder(new CompoundBorder(
+			new LineBorder(ColorScheme.MEDIUM_GRAY_COLOR, 1),
+			new EmptyBorder(2, 4, 2, 4)
+		));
+		sortComboBox.addActionListener(e -> {
+			SortOption selected = (SortOption) sortComboBox.getSelectedItem();
+			if (selected != null)
+			{
+				currentSortOption = selected;
+				if (configManager != null)
+				{
+					configManager.setConfiguration(CONFIG_GROUP, "sortOption", selected);
+				}
+				rebuild();
+			}
+		});
+		
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.insets = new Insets(0, 0, 0, 4);
+		infoPanel.add(sortComboBox, gbc);
+		
+		// Sort direction button
+		JButton sortDirectionButton = new JButton(currentSortDescending ? "↓" : "↑");
+		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 14));
+		sortDirectionButton.setPreferredSize(new Dimension(28, 24));
+		sortDirectionButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		sortDirectionButton.setForeground(Color.WHITE);
+		sortDirectionButton.setFocusable(false);
+		sortDirectionButton.setBorder(new LineBorder(ColorScheme.MEDIUM_GRAY_COLOR, 1));
+		sortDirectionButton.setToolTipText(currentSortDescending ? "Descending" : "Ascending");
+		sortDirectionButton.addActionListener(e -> {
+			currentSortDescending = !currentSortDescending;
+			sortDirectionButton.setText(currentSortDescending ? "↓" : "↑");
+			sortDirectionButton.setToolTipText(currentSortDescending ? "Descending" : "Ascending");
+			if (configManager != null)
+			{
+				configManager.setConfiguration(CONFIG_GROUP, "sortDescending", currentSortDescending);
+			}
+			rebuild();
+		});
+		// Add hover effect
+		sortDirectionButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				sortDirectionButton.setBackground(ColorScheme.DARK_GRAY_HOVER_COLOR);
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				sortDirectionButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+			}
+		});
+		
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		infoPanel.add(sortDirectionButton, gbc);
+		
+		titlePanel.add(infoPanel, BorderLayout.EAST);
 
 		add(titlePanel, BorderLayout.NORTH);
 
@@ -122,7 +216,7 @@ public class SalvageSackPanel extends PluginPanel
 					totalOpens += data.getTotalLoots();
 				}
 			}
-			totalOpensLabel.setText(totalOpens + "  Total Sorts");
+			totalOpensLabel.setText(totalOpens + " Total Salvage Sorted");
 
 			if (salvageDataMap == null || salvageDataMap.isEmpty())
 			{
@@ -206,7 +300,9 @@ public class SalvageSackPanel extends PluginPanel
 		itemsPanel.setBorder(new EmptyBorder(2, 4, 4, 4));
 		itemsPanel.setVisible(isExpanded);
 
-		for (SalvageItem item : data.getItems().values())
+		// Sort items based on config
+		List<SalvageItem> sortedItems = getSortedItems(data);
+		for (SalvageItem item : sortedItems)
 		{
 			itemsPanel.add(createItemPanel(item, data.getTotalLoots(), data.getShipwreckType()));
 			itemsPanel.add(Box.createVerticalStrut(2));
@@ -339,8 +435,46 @@ public class SalvageSackPanel extends PluginPanel
 	}
 
 	/**
-	 * Calculate luck color based on current vs expected drop rate
+	 * Get sorted list of items based on config settings
 	 */
+	private List<SalvageItem> getSortedItems(SalvageData data)
+	{
+		List<SalvageItem> items = new ArrayList<>(data.getItems().values());
+		
+		Comparator<SalvageItem> comparator;
+		
+		switch (currentSortOption)
+		{
+			case ALPHABETICAL:
+				comparator = Comparator.comparing(SalvageItem::getItemName);
+				break;
+			
+			case CURRENT_RATE:
+				comparator = Comparator.comparingDouble(item -> item.getCurrentDropRate(data.getTotalLoots()));
+				break;
+			
+			case EXPECTED_RATE:
+				comparator = Comparator.comparingDouble(SalvageItem::getExpectedDropRate);
+				break;
+			
+			case QUANTITY:
+				comparator = Comparator.comparingInt(SalvageItem::getTotalQuantity);
+				break;
+			
+			default:
+				comparator = Comparator.comparing(SalvageItem::getItemName);
+				break;
+		}
+		
+		if (currentSortDescending)
+		{
+			comparator = comparator.reversed();
+		}
+		
+		items.sort(comparator);
+		return items;
+	}
+
 	private Color getLuckColor(double currentRate, double expectedRate)
 	{
 		if (expectedRate <= 0)
