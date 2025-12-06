@@ -36,6 +36,7 @@ public class PirateRankPanel extends JPanel
 	private long rankUpEffectStartTime = 0;
 	private Timer rankUpEffectTimer = null;
 	private static final long RANK_UP_EFFECT_DURATION = 2000; // 2 seconds
+	private static final int ANIMATION_FRAME_DELAY_MS = 50; // 20 FPS
 
 	public PirateRankPanel()
 	{
@@ -172,17 +173,30 @@ public class PirateRankPanel extends JPanel
 	 */
 	private void triggerRankUpEffect()
 	{
-		// Stop any existing timer to prevent memory leak
+		stopRankUpEffect();
+		startRankUpEffect();
+	}
+
+	/**
+	 * Stop any existing rank up animation
+	 */
+	private void stopRankUpEffect()
+	{
 		if (rankUpEffectTimer != null && rankUpEffectTimer.isRunning())
 		{
 			rankUpEffectTimer.stop();
 		}
-		
+	}
+
+	/**
+	 * Start the rank up animation
+	 */
+	private void startRankUpEffect()
+	{
 		showRankUpEffect = true;
 		rankUpEffectStartTime = System.currentTimeMillis();
 		
-		// Start animation timer
-		rankUpEffectTimer = new Timer(50, null);
+		rankUpEffectTimer = new Timer(ANIMATION_FRAME_DELAY_MS, null);
 		rankUpEffectTimer.addActionListener(e -> {
 			long elapsed = System.currentTimeMillis() - rankUpEffectStartTime;
 			if (elapsed >= RANK_UP_EFFECT_DURATION)

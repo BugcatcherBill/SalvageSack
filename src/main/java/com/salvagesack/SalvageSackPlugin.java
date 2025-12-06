@@ -244,7 +244,8 @@ public class SalvageSackPlugin extends Plugin
 			if (config.enablePirateRanks() && pirateRankData != null && itemManager != null)
 			{
 				int highAlchValue = getHighAlchValue(itemId);
-				if (highAlchValue > 0)
+				// Validate quantity is reasonable (prevent DoS with extreme values)
+				if (highAlchValue > 0 && quantity > 0 && quantity <= 1000000)
 				{
 					// Cast to long before multiplication to prevent overflow
 					long bootyGained = ((long) highAlchValue) * quantity;
