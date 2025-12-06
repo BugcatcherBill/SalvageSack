@@ -74,28 +74,7 @@ public class SalvageSackPanel extends PluginPanel
 		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		titlePanel.setBorder(new EmptyBorder(10, 12, 10, 12));
 
-		// Left side: Icon
-		JLabel iconLabel = new JLabel();
-		try
-		{
-			BufferedImage iconImage = net.runelite.client.util.ImageUtil.loadImageResource(getClass(), "/icon.png");
-			if (iconImage != null)
-			{
-				// Scale icon to 24x24 for header
-				Image scaledIcon = iconImage.getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-				iconLabel.setIcon(new ImageIcon(scaledIcon));
-			}
-		}
-		catch (Exception e)
-		{
-			// Fallback: use text if icon fails to load
-			iconLabel.setText("SS");
-			iconLabel.setForeground(Color.WHITE);
-			iconLabel.setFont(new Font("Arial", Font.BOLD, 14));
-		}
-		iconLabel.setBorder(new EmptyBorder(0, 0, 0, 10));
-
-		// Center/Right side: Stats and controls organized in a grid
+		// Right side: Stats and controls organized in a grid
 		JPanel infoPanel = new JPanel(new GridBagLayout());
 		infoPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -109,20 +88,9 @@ public class SalvageSackPanel extends PluginPanel
 		
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.gridwidth = 3;
+		gbc.gridwidth = 2;
 		gbc.insets = new Insets(0, 0, 4, 0);
 		infoPanel.add(totalOpensLabel, gbc);
-		
-		// Item ordering label
-		JLabel orderingLabel = new JLabel("Item ordering:");
-		orderingLabel.setForeground(Color.LIGHT_GRAY);
-		orderingLabel.setFont(new Font("Arial", Font.PLAIN, 10));
-		
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.insets = new Insets(0, 0, 0, 4);
-		infoPanel.add(orderingLabel, gbc);
 		
 		// Sort dropdown
 		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
@@ -148,8 +116,9 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		});
 		
-		gbc.gridx = 1;
+		gbc.gridx = 0;
 		gbc.gridy = 1;
+		gbc.gridwidth = 1;
 		gbc.insets = new Insets(0, 0, 0, 4);
 		infoPanel.add(sortComboBox, gbc);
 		
@@ -185,12 +154,11 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		});
 		
-		gbc.gridx = 2;
+		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.insets = new Insets(0, 0, 0, 0);
 		infoPanel.add(sortDirectionButton, gbc);
 		
-		titlePanel.add(iconLabel, BorderLayout.WEST);
 		titlePanel.add(infoPanel, BorderLayout.EAST);
 
 		add(titlePanel, BorderLayout.NORTH);
