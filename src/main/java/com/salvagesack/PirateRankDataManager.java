@@ -1,7 +1,6 @@
 package com.salvagesack;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -23,7 +22,7 @@ public class PirateRankDataManager
 	public PirateRankDataManager(File dataDirectory, Gson gson)
 	{
 		this.dataDirectory = dataDirectory;
-		this.gson = new GsonBuilder().setPrettyPrinting().create();
+		this.gson = gson;
 	}
 
 	/**
