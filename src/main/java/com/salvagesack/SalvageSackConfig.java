@@ -26,4 +26,14 @@ public interface SalvageSackConfig extends Config
 	{
 		return false;
 	}
+
+	@ConfigItem(
+		keyName = "enablePirateRanks",
+		name = "Enable Pirate Ranks",
+		description = "Enable the pirate rank microgame that tracks your booty and progression"
+	)
+	default boolean enablePirateRanks()
+	{
+		return true;
+	}
 }
