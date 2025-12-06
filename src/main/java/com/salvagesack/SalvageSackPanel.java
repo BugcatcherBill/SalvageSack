@@ -44,7 +44,6 @@ public class SalvageSackPanel extends PluginPanel
 	private final Map<ShipwreckType, Boolean> expandedState = new HashMap<>();
 	private final JLabel totalOpensLabel;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
-	private ConfigManager configManager;
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
