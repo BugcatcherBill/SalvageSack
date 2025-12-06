@@ -47,6 +47,7 @@ public class SalvageSackPanel extends PluginPanel
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
 	private SortOption currentSortOption;
 	private boolean currentSortDescending;
+	private PirateRankPanel pirateRankPanel;
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
@@ -59,6 +60,9 @@ public class SalvageSackPanel extends PluginPanel
 
 	@lombok.Setter
 	private ConfigManager configManager;
+
+	@lombok.Setter
+	private PirateRankData pirateRankData;
 
 	public SalvageSackPanel(ItemIconManager iconManager, SalvageSackConfig config)
 	{
@@ -178,6 +182,9 @@ public class SalvageSackPanel extends PluginPanel
 
 		add(scrollPane, BorderLayout.CENTER);
 
+		// Initialize pirate rank panel but don't add it yet (will be added in rebuild based on config)
+		pirateRankPanel = new PirateRankPanel();
+
 		rebuild();
 	}
 
@@ -199,6 +206,13 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		}
 
+		// Update pirate rank display if data is available
+		if (pirateRankData != null && pirateRankPanel != null)
+		{
+			pirateRankPanel.setRankData(pirateRankData);
+			pirateRankPanel.updateDisplay();
+		}
+
 		rebuild();
 	}
 
@@ -206,6 +220,14 @@ public class SalvageSackPanel extends PluginPanel
 	{
 		SwingUtilities.invokeLater(() -> {
 			contentPanel.removeAll();
+
+			// Add pirate rank panel at the top if enabled
+			if (config.enablePirateRanks() && pirateRankPanel != null)
+			{
+				pirateRankPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+				contentPanel.add(pirateRankPanel);
+				contentPanel.add(Box.createVerticalStrut(10));
+			}
 
 			// Calculate total opens across all shipwreck types
 			int totalOpens = 0;
@@ -516,6 +538,18 @@ public class SalvageSackPanel extends PluginPanel
 		int g = (int) (c1.getGreen() + t * (c2.getGreen() - c1.getGreen()));
 		int b = (int) (c1.getBlue() + t * (c2.getBlue() - c1.getBlue()));
 		return new Color(r, g, b);
+	}
+
+	/**
+	 * Update the pirate rank display
+	 */
+	public void updatePirateRankDisplay()
+	{
+		if (pirateRankPanel != null && pirateRankData != null)
+		{
+			pirateRankPanel.setRankData(pirateRankData);
+			pirateRankPanel.updateDisplay();
+		}
 	}
 
 	/**

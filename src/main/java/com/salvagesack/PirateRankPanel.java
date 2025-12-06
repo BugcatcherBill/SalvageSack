@@ -1,0 +1,263 @@
+package com.salvagesack;
+
+import lombok.Setter;
+import net.runelite.client.ui.ColorScheme;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+/**
+ * Panel that displays pirate rank progression with a circular dial and progress bar
+ */
+public class PirateRankPanel extends JPanel
+{
+	private static final int DIAL_SIZE = 120;
+	private static final Color PROGRESS_FILL = new Color(218, 165, 32); // Gold
+	private static final Color PROGRESS_BACKGROUND = new Color(60, 60, 60);
+	private static final Color BORDER_COLOR = new Color(139, 69, 19); // Brown
+	private static final Color RANK_UP_COLOR = new Color(255, 215, 0); // Bright gold
+
+	@Setter
+	private PirateRankData rankData;
+	
+	private final JLabel rankTitleLabel;
+	private final JLabel rankDescriptionLabel;
+	private final JLabel bootyLabel;
+	private final JLabel progressLabel;
+	private final JProgressBar progressBar;
+	private final DialPanel dialPanel;
+	
+	private boolean showRankUpEffect = false;
+	private long rankUpEffectStartTime = 0;
+	private static final long RANK_UP_EFFECT_DURATION = 2000; // 2 seconds
+
+	public PirateRankPanel()
+	{
+		setLayout(new BorderLayout(0, 8));
+		setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		// Dial panel
+		dialPanel = new DialPanel();
+		dialPanel.setPreferredSize(new Dimension(DIAL_SIZE, DIAL_SIZE));
+		dialPanel.setMaximumSize(new Dimension(DIAL_SIZE, DIAL_SIZE));
+		dialPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		// Rank info panel
+		JPanel infoPanel = new JPanel();
+		infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+		infoPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		infoPanel.setBorder(new EmptyBorder(5, 0, 5, 0));
+
+		rankTitleLabel = new JLabel("Castaway");
+		rankTitleLabel.setForeground(Color.WHITE);
+		rankTitleLabel.setFont(new Font("Serif", Font.BOLD, 18));
+		rankTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		rankDescriptionLabel = new JLabel("Cast ashore with nothing");
+		rankDescriptionLabel.setForeground(Color.LIGHT_GRAY);
+		rankDescriptionLabel.setFont(new Font("Arial", Font.ITALIC, 11));
+		rankDescriptionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		bootyLabel = new JLabel("Booty: 0 gp");
+		bootyLabel.setForeground(new Color(218, 165, 32));
+		bootyLabel.setFont(new Font("Arial", Font.BOLD, 12));
+		bootyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		infoPanel.add(rankTitleLabel);
+		infoPanel.add(Box.createVerticalStrut(2));
+		infoPanel.add(rankDescriptionLabel);
+		infoPanel.add(Box.createVerticalStrut(5));
+		infoPanel.add(bootyLabel);
+
+		// Progress section
+		JPanel progressPanel = new JPanel();
+		progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.Y_AXIS));
+		progressPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		progressPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
+
+		progressLabel = new JLabel("Next rank: 2,000 gp");
+		progressLabel.setForeground(Color.LIGHT_GRAY);
+		progressLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+		progressLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		progressBar = new JProgressBar(0, 1000);
+		progressBar.setValue(0);
+		progressBar.setStringPainted(false);
+		progressBar.setPreferredSize(new Dimension(200, 20));
+		progressBar.setMaximumSize(new Dimension(200, 20));
+		progressBar.setBackground(PROGRESS_BACKGROUND);
+		progressBar.setForeground(PROGRESS_FILL);
+		progressBar.setBorderPainted(true);
+		progressBar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		progressPanel.add(progressLabel);
+		progressPanel.add(Box.createVerticalStrut(3));
+		progressPanel.add(progressBar);
+
+		// Add all components
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+		centerPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		centerPanel.add(dialPanel);
+		centerPanel.add(Box.createVerticalStrut(10));
+		centerPanel.add(infoPanel);
+		centerPanel.add(progressPanel);
+
+		add(centerPanel, BorderLayout.CENTER);
+
+		// Initialize with default data
+		if (rankData == null)
+		{
+			rankData = new PirateRankData();
+		}
+		updateDisplay();
+	}
+
+	/**
+	 * Update the display with current rank data
+	 */
+	public void updateDisplay()
+	{
+		if (rankData == null)
+		{
+			return;
+		}
+
+		SwingUtilities.invokeLater(() -> {
+			PirateRank rank = rankData.getCurrentRank();
+			
+			// Update labels
+			rankTitleLabel.setText(rank.getDisplayName());
+			rankDescriptionLabel.setText(rank.getDescription());
+			
+			NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+			bootyLabel.setText("Booty: " + numberFormat.format(rankData.getTotalBooty()) + " gp");
+
+			// Update progress bar
+			double progress = rankData.getProgressToNextRank();
+			progressBar.setValue((int) (progress * 1000));
+
+			// Update progress label
+			PirateRank nextRank = rank.getNextRank();
+			if (nextRank != null)
+			{
+				long needed = rankData.getBootyNeededForNextRank();
+				progressLabel.setText("Next rank: " + numberFormat.format(needed) + " gp");
+			}
+			else
+			{
+				progressLabel.setText("Maximum rank achieved!");
+			}
+
+			// Check for rank up effect
+			if (rankData.isJustRankedUp())
+			{
+				triggerRankUpEffect();
+				rankData.clearRankUpFlag();
+			}
+
+			dialPanel.repaint();
+		});
+	}
+
+	/**
+	 * Trigger the rank up visual effect
+	 */
+	private void triggerRankUpEffect()
+	{
+		showRankUpEffect = true;
+		rankUpEffectStartTime = System.currentTimeMillis();
+		
+		// Start animation timer
+		Timer timer = new Timer(50, null);
+		timer.addActionListener(e -> {
+			long elapsed = System.currentTimeMillis() - rankUpEffectStartTime;
+			if (elapsed >= RANK_UP_EFFECT_DURATION)
+			{
+				showRankUpEffect = false;
+				timer.stop();
+			}
+			dialPanel.repaint();
+		});
+		timer.start();
+	}
+
+	/**
+	 * Inner class for the circular dial display
+	 */
+	private class DialPanel extends JPanel
+	{
+		@Override
+		protected void paintComponent(Graphics g)
+		{
+			super.paintComponent(g);
+			Graphics2D g2d = (Graphics2D) g.create();
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			int width = getWidth();
+			int height = getHeight();
+			int centerX = width / 2;
+			int centerY = height / 2;
+			int diameter = Math.min(width, height) - 10;
+			int x = centerX - diameter / 2;
+			int y = centerY - diameter / 2;
+
+			// Draw background circle
+			g2d.setColor(new Color(40, 40, 40));
+			g2d.fill(new Ellipse2D.Double(x, y, diameter, diameter));
+
+			// Draw progress arc
+			if (rankData != null)
+			{
+				double progress = rankData.getProgressToNextRank();
+				double angle = 360.0 * progress;
+
+				// Draw progress arc
+				g2d.setColor(PROGRESS_FILL);
+				g2d.setStroke(new BasicStroke(6));
+				Arc2D.Double arc = new Arc2D.Double(x, y, diameter, diameter, 90, -angle, Arc2D.OPEN);
+				g2d.draw(arc);
+			}
+
+			// Draw border
+			g2d.setColor(BORDER_COLOR);
+			g2d.setStroke(new BasicStroke(3));
+			g2d.draw(new Ellipse2D.Double(x, y, diameter, diameter));
+
+			// Rank up glow effect
+			if (showRankUpEffect)
+			{
+				long elapsed = System.currentTimeMillis() - rankUpEffectStartTime;
+				float alpha = 1.0f - ((float) elapsed / RANK_UP_EFFECT_DURATION);
+				alpha = Math.max(0, Math.min(1, alpha));
+				
+				g2d.setColor(new Color(RANK_UP_COLOR.getRed(), RANK_UP_COLOR.getGreen(), 
+					RANK_UP_COLOR.getBlue(), (int) (alpha * 150)));
+				g2d.setStroke(new BasicStroke(8));
+				g2d.draw(new Ellipse2D.Double(x - 2, y - 2, diameter + 4, diameter + 4));
+			}
+
+			// Draw rank icon text (placeholder - could be replaced with actual icons)
+			if (rankData != null)
+			{
+				PirateRank rank = rankData.getCurrentRank();
+				String rankOrdinal = String.valueOf(rank.ordinal() + 1);
+				
+				g2d.setColor(Color.WHITE);
+				g2d.setFont(new Font("Serif", Font.BOLD, 36));
+				FontMetrics fm = g2d.getFontMetrics();
+				int textWidth = fm.stringWidth(rankOrdinal);
+				int textHeight = fm.getAscent();
+				g2d.drawString(rankOrdinal, centerX - textWidth / 2, centerY + textHeight / 2);
+			}
+
+			g2d.dispose();
+		}
+	}
+}
