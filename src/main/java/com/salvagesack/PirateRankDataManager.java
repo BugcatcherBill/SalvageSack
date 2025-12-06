@@ -48,11 +48,18 @@ public class PirateRankDataManager
 				return new PirateRankData();
 			}
 			
+			// Check if deserialization resulted in null rank (e.g., from old enum values)
+			if (data.getCurrentRank() == null)
+			{
+				log.warn("Deserialized pirate rank data has null currentRank (likely old save file), creating new instance");
+				return new PirateRankData();
+			}
+			
 			log.debug("Loaded pirate rank data: {} with {} booty", 
 				data.getCurrentRank().getDisplayName(), data.getTotalBooty());
 			return data;
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			log.error("Failed to load pirate rank data", e);
 			return new PirateRankData();

@@ -83,7 +83,7 @@ public class PirateRankPanel extends JPanel
 		progressPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		progressPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-		progressLabel = new JLabel("Next rank: 2,000 gp");
+		progressLabel = new JLabel("Next rank: 22,021 gp");
 		progressLabel.setForeground(Color.LIGHT_GRAY);
 		progressLabel.setFont(new Font("Arial", Font.PLAIN, 10));
 		progressLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
