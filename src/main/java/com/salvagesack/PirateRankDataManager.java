@@ -49,10 +49,10 @@ public class PirateRankDataManager
 				return new PirateRankData();
 			}
 			
-			// Check if deserialization resulted in null rank (e.g., from old enum values)
+			// Check if deserialization resulted in null rank
 			if (data.getCurrentRank() == null)
 			{
-				log.warn("Old pirate rank save file detected with incompatible enum values, deleting and starting fresh");
+				log.warn("Corrupted pirate rank save file detected, deleting and starting fresh");
 				file.delete();
 				return new PirateRankData();
 			}

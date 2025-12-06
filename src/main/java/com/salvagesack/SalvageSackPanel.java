@@ -264,6 +264,8 @@ public class SalvageSackPanel extends PluginPanel
 				}
 			}
 
+			// Add vertical glue to anchor content to the top
+			contentPanel.add(Box.createVerticalGlue());
 
 			contentPanel.revalidate();
 			contentPanel.repaint();
