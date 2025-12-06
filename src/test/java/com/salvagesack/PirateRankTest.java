@@ -33,16 +33,16 @@ public class PirateRankTest
 	{
 		// Starting rank
 		assertEquals(PirateRank.RANK_1, PirateRank.getRankForBooty(0));
-		assertEquals(PirateRank.RANK_1, PirateRank.getRankForBooty(999));
+		assertEquals(PirateRank.RANK_1, PirateRank.getRankForBooty(22020));
 		
 		// Second rank
-		assertEquals(PirateRank.RANK_2, PirateRank.getRankForBooty(1000));
-		assertEquals(PirateRank.RANK_2, PirateRank.getRankForBooty(1999));
+		assertEquals(PirateRank.RANK_2, PirateRank.getRankForBooty(22021));
+		assertEquals(PirateRank.RANK_2, PirateRank.getRankForBooty(124569));
 		
 		// Test some intermediate ranks
-		assertEquals(PirateRank.RANK_10, PirateRank.getRankForBooty(10000));
-		assertEquals(PirateRank.RANK_20, PirateRank.getRankForBooty(50000));
-		assertEquals(PirateRank.RANK_40, PirateRank.getRankForBooty(1000000));
+		assertEquals(PirateRank.RANK_10, PirateRank.getRankForBooty(5351162));
+		assertEquals(PirateRank.RANK_20, PirateRank.getRankForBooty(34651806));
+		assertEquals(PirateRank.RANK_40, PirateRank.getRankForBooty(209171926));
 		
 		// Maximum rank
 		assertEquals(PirateRank.RANK_100, PirateRank.getRankForBooty(Integer.MAX_VALUE));
@@ -68,14 +68,14 @@ public class PirateRankTest
 		// At exact rank requirement, progress should be 0
 		assertEquals(0.0, PirateRank.RANK_1.getProgressToNextRank(0), 0.001);
 		
-		// Halfway to next rank (500 / 1000)
-		assertEquals(0.5, PirateRank.RANK_1.getProgressToNextRank(500), 0.001);
+		// Halfway to next rank (11010 / 22021)
+		assertEquals(0.5, PirateRank.RANK_1.getProgressToNextRank(11010), 0.001);
 		
 		// Almost at next rank
-		assertEquals(0.99, PirateRank.RANK_1.getProgressToNextRank(990), 0.01);
+		assertEquals(0.99, PirateRank.RANK_1.getProgressToNextRank(21801), 0.01);
 		
 		// Past the rank requirement (should still calculate correctly)
-		assertEquals(1.0, PirateRank.RANK_1.getProgressToNextRank(1000), 0.001);
+		assertEquals(1.0, PirateRank.RANK_1.getProgressToNextRank(22021), 0.001);
 		
 		// Max rank should always be 100% progress
 		assertEquals(1.0, PirateRank.RANK_100.getProgressToNextRank(Integer.MAX_VALUE), 0.001);
