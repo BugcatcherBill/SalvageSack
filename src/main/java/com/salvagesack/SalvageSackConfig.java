@@ -2,10 +2,28 @@ package com.salvagesack;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup("salvagesack")
 public interface SalvageSackConfig extends Config
 {
-	// Configuration options can be added here as needed
-	// Reset functionality is now available via right-click on shipwreck sections in the panel
+	@ConfigItem(
+		keyName = "sortOption",
+		name = "Sort Items By",
+		description = "Choose how to sort items within each shipwreck type"
+	)
+	default SortOption sortOption()
+	{
+		return SortOption.ALPHABETICAL;
+	}
+
+	@ConfigItem(
+		keyName = "sortDescending",
+		name = "Sort Descending",
+		description = "Sort items in descending order (highest to lowest)"
+	)
+	default boolean sortDescending()
+	{
+		return false;
+	}
 }

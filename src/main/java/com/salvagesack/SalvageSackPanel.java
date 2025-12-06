@@ -1,6 +1,7 @@
 package com.salvagesack;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
@@ -33,9 +34,11 @@ public class SalvageSackPanel extends PluginPanel
 
 	private final JPanel contentPanel;
 	private final ItemIconManager iconManager;
+	private final SalvageSackConfig config;
 	private final Map<ShipwreckType, Boolean> expandedState = new HashMap<>();
 	private final JLabel totalOpensLabel;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
+	private ConfigManager configManager;
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
@@ -46,10 +49,14 @@ public class SalvageSackPanel extends PluginPanel
 	@lombok.Setter
 	private Runnable onResetAll;
 
-	public SalvageSackPanel(ItemIconManager iconManager)
+	@lombok.Setter
+	private ConfigManager configManager;
+
+	public SalvageSackPanel(ItemIconManager iconManager, SalvageSackConfig config)
 	{
 		super(false);
 		this.iconManager = iconManager;
+		this.config = config;
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
@@ -57,15 +64,71 @@ public class SalvageSackPanel extends PluginPanel
 		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		titlePanel.setBorder(new EmptyBorder(8, 10, 8, 10));
 
+		// Left side: Title
 		JLabel title = new JLabel("Salvage Sack");
 		title.setForeground(Color.WHITE);
 		title.setFont(new Font("Arial", Font.BOLD, 16));
-		titlePanel.add(title, BorderLayout.WEST);
 
+		// Right side: Total and sort controls
+		JPanel rightPanel = new JPanel();
+		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+		rightPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		
 		totalOpensLabel = new JLabel("0 Sorts");
 		totalOpensLabel.setForeground(Color.LIGHT_GRAY);
 		totalOpensLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-		titlePanel.add(totalOpensLabel, BorderLayout.EAST);
+		totalOpensLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		
+		// Sort controls panel
+		JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+		sortPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		
+		// Sort dropdown
+		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
+		sortComboBox.setSelectedItem(config.sortOption());
+		sortComboBox.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		sortComboBox.setForeground(Color.LIGHT_GRAY);
+		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 9));
+		sortComboBox.setFocusable(false);
+		sortComboBox.addActionListener(e -> {
+			if (configManager != null)
+			{
+				SortOption selected = (SortOption) sortComboBox.getSelectedItem();
+				configManager.setConfiguration("salvagesack", "sortOption", selected);
+			}
+			rebuild();
+		});
+		
+		// Sort direction button
+		JButton sortDirectionButton = new JButton(config.sortDescending() ? "↓" : "↑");
+		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 12));
+		sortDirectionButton.setPreferredSize(new Dimension(24, 20));
+		sortDirectionButton.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		sortDirectionButton.setForeground(Color.LIGHT_GRAY);
+		sortDirectionButton.setFocusable(false);
+		sortDirectionButton.setBorderPainted(false);
+		sortDirectionButton.setToolTipText(config.sortDescending() ? "Descending" : "Ascending");
+		sortDirectionButton.addActionListener(e -> {
+			boolean newDescending = !config.sortDescending();
+			sortDirectionButton.setText(newDescending ? "↓" : "↑");
+			sortDirectionButton.setToolTipText(newDescending ? "Descending" : "Ascending");
+			if (configManager != null)
+			{
+				configManager.setConfiguration("salvagesack", "sortDescending", newDescending);
+			}
+			rebuild();
+		});
+		
+		sortPanel.add(new JLabel("Sort: "));
+		sortPanel.add(sortComboBox);
+		sortPanel.add(sortDirectionButton);
+		
+		rightPanel.add(totalOpensLabel);
+		rightPanel.add(Box.createVerticalStrut(2));
+		rightPanel.add(sortPanel);
+		
+		titlePanel.add(title, BorderLayout.WEST);
+		titlePanel.add(rightPanel, BorderLayout.EAST);
 
 		add(titlePanel, BorderLayout.NORTH);
 
@@ -206,7 +269,9 @@ public class SalvageSackPanel extends PluginPanel
 		itemsPanel.setBorder(new EmptyBorder(2, 4, 4, 4));
 		itemsPanel.setVisible(isExpanded);
 
-		for (SalvageItem item : data.getItems().values())
+		// Sort items based on config
+		List<SalvageItem> sortedItems = getSortedItems(data);
+		for (SalvageItem item : sortedItems)
 		{
 			itemsPanel.add(createItemPanel(item, data.getTotalLoots(), data.getShipwreckType()));
 			itemsPanel.add(Box.createVerticalStrut(2));
@@ -339,8 +404,49 @@ public class SalvageSackPanel extends PluginPanel
 	}
 
 	/**
-	 * Calculate luck color based on current vs expected drop rate
+	 * Get sorted list of items based on config settings
 	 */
+	private List<SalvageItem> getSortedItems(SalvageData data)
+	{
+		List<SalvageItem> items = new ArrayList<>(data.getItems().values());
+		
+		SortOption sortOption = config != null ? config.sortOption() : SortOption.ALPHABETICAL;
+		boolean descending = config != null && config.sortDescending();
+		
+		Comparator<SalvageItem> comparator;
+		
+		switch (sortOption)
+		{
+			case ALPHABETICAL:
+				comparator = Comparator.comparing(SalvageItem::getItemName);
+				break;
+			
+			case CURRENT_RATE:
+				comparator = Comparator.comparingDouble(item -> item.getCurrentDropRate(data.getTotalLoots()));
+				break;
+			
+			case EXPECTED_RATE:
+				comparator = Comparator.comparingDouble(SalvageItem::getExpectedDropRate);
+				break;
+			
+			case QUANTITY:
+				comparator = Comparator.comparingInt(SalvageItem::getTotalQuantity);
+				break;
+			
+			default:
+				comparator = Comparator.comparing(SalvageItem::getItemName);
+				break;
+		}
+		
+		if (descending)
+		{
+			comparator = comparator.reversed();
+		}
+		
+		items.sort(comparator);
+		return items;
+	}
+
 	private Color getLuckColor(double currentRate, double expectedRate)
 	{
 		if (expectedRate <= 0)
