@@ -74,27 +74,22 @@ public class SalvageSackPanel extends PluginPanel
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
-		JPanel titlePanel = new JPanel(new BorderLayout());
+		// Title panel with center-aligned content
+		JPanel titlePanel = new JPanel();
+		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
 		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		titlePanel.setBorder(new EmptyBorder(10, 12, 10, 12));
+		titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		// Right side: Stats and controls organized in a grid
-		JPanel infoPanel = new JPanel(new GridBagLayout());
-		infoPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 8, 0, 0);
-		
-		// Total salvage label
+		// Total salvage label - center aligned
 		totalOpensLabel = new JLabel("0 Total Salvage Sorted");
 		totalOpensLabel.setForeground(Color.WHITE);
 		totalOpensLabel.setFont(new Font("Arial", Font.BOLD, 11));
+		totalOpensLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 2;
-		gbc.insets = new Insets(0, 0, 4, 0);
-		infoPanel.add(totalOpensLabel, gbc);
+		// Sort controls panel - center aligned
+		JPanel sortControlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+		sortControlsPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		sortControlsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 		// Sort dropdown
 		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
@@ -119,12 +114,6 @@ public class SalvageSackPanel extends PluginPanel
 				rebuild();
 			}
 		});
-		
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.insets = new Insets(0, 0, 0, 4);
-		infoPanel.add(sortComboBox, gbc);
 		
 		// Sort direction button
 		JButton sortDirectionButton = new JButton(currentSortDescending ? "↓" : "↑");
@@ -158,12 +147,12 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		});
 		
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		infoPanel.add(sortDirectionButton, gbc);
+		sortControlsPanel.add(sortComboBox);
+		sortControlsPanel.add(sortDirectionButton);
 		
-		titlePanel.add(infoPanel, BorderLayout.EAST);
+		titlePanel.add(totalOpensLabel);
+		titlePanel.add(Box.createVerticalStrut(5));
+		titlePanel.add(sortControlsPanel);
 
 		add(titlePanel, BorderLayout.NORTH);
 

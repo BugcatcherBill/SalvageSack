@@ -11,7 +11,7 @@ public class PirateRankDataTest
 		PirateRankData data = new PirateRankData();
 		
 		assertEquals(0, data.getTotalBooty());
-		assertEquals(PirateRank.CASTAWAY, data.getCurrentRank());
+		assertEquals(PirateRank.RANK_1, data.getCurrentRank());
 		assertNull(data.getPreviousRank());
 		assertFalse(data.isJustRankedUp());
 	}
@@ -22,11 +22,11 @@ public class PirateRankDataTest
 		PirateRankData data = new PirateRankData();
 		
 		// Add booty but not enough to rank up
-		boolean rankedUp = data.addBooty(1000);
+		boolean rankedUp = data.addBooty(500);
 		
 		assertFalse(rankedUp);
-		assertEquals(1000, data.getTotalBooty());
-		assertEquals(PirateRank.CASTAWAY, data.getCurrentRank());
+		assertEquals(500, data.getTotalBooty());
+		assertEquals(PirateRank.RANK_1, data.getCurrentRank());
 		assertFalse(data.isJustRankedUp());
 	}
 
@@ -36,12 +36,12 @@ public class PirateRankDataTest
 		PirateRankData data = new PirateRankData();
 		
 		// Add enough booty to rank up
-		boolean rankedUp = data.addBooty(2000);
+		boolean rankedUp = data.addBooty(1000);
 		
 		assertTrue(rankedUp);
-		assertEquals(2000, data.getTotalBooty());
-		assertEquals(PirateRank.DECK_SWABBER, data.getCurrentRank());
-		assertEquals(PirateRank.CASTAWAY, data.getPreviousRank());
+		assertEquals(1000, data.getTotalBooty());
+		assertEquals(PirateRank.RANK_2, data.getCurrentRank());
+		assertEquals(PirateRank.RANK_1, data.getPreviousRank());
 		assertTrue(data.isJustRankedUp());
 	}
 
@@ -51,16 +51,16 @@ public class PirateRankDataTest
 		PirateRankData data = new PirateRankData();
 		
 		// First rank up
-		data.addBooty(2000);
-		assertEquals(PirateRank.DECK_SWABBER, data.getCurrentRank());
+		data.addBooty(1000);
+		assertEquals(PirateRank.RANK_2, data.getCurrentRank());
 		
 		// Clear the flag
 		data.clearRankUpFlag();
 		assertFalse(data.isJustRankedUp());
 		
 		// Second rank up
-		data.addBooty(2000); // Total: 4000
-		assertEquals(PirateRank.CABIN_BOY, data.getCurrentRank());
+		data.addBooty(1000); // Total: 2000
+		assertEquals(PirateRank.RANK_3, data.getCurrentRank());
 		assertTrue(data.isJustRankedUp());
 	}
 
@@ -74,7 +74,7 @@ public class PirateRankDataTest
 		
 		assertTrue(rankedUp);
 		assertEquals(100000, data.getTotalBooty());
-		assertEquals(PirateRank.PRIVATEER, data.getCurrentRank());
+		assertEquals(PirateRank.RANK_25, data.getCurrentRank());
 	}
 
 	@Test
@@ -86,15 +86,15 @@ public class PirateRankDataTest
 		assertEquals(0.0, data.getProgressToNextRank(), 0.001);
 		
 		// Add half the required booty
-		data.addBooty(1000); // Need 2000 total for next rank
+		data.addBooty(500); // Need 1000 total for next rank
 		assertEquals(0.5, data.getProgressToNextRank(), 0.001);
 		
 		// Add more to reach next rank
-		data.addBooty(1000); // Now at 2000, should be at DECK_SWABBER
+		data.addBooty(500); // Now at 1000, should be at RANK_2
 		assertEquals(0.0, data.getProgressToNextRank(), 0.001);
 		
-		// Add partial progress toward next rank (CABIN_BOY at 4000)
-		data.addBooty(1000); // Now at 3000, halfway between 2000 and 4000
+		// Add partial progress toward next rank (RANK_3 at 2000)
+		data.addBooty(500); // Now at 1500, halfway between 1000 and 2000
 		assertEquals(0.5, data.getProgressToNextRank(), 0.001);
 	}
 
@@ -103,16 +103,16 @@ public class PirateRankDataTest
 	{
 		PirateRankData data = new PirateRankData();
 		
-		// At start, need 2000 for DECK_SWABBER
-		assertEquals(2000, data.getBootyNeededForNextRank());
-		
-		// Add 1000
-		data.addBooty(1000);
+		// At start, need 1000 for RANK_2
 		assertEquals(1000, data.getBootyNeededForNextRank());
 		
-		// Reach DECK_SWABBER (need 4000 for CABIN_BOY)
-		data.addBooty(1000);
-		assertEquals(2000, data.getBootyNeededForNextRank());
+		// Add 500
+		data.addBooty(500);
+		assertEquals(500, data.getBootyNeededForNextRank());
+		
+		// Reach RANK_2 (need 2000 for RANK_3)
+		data.addBooty(500);
+		assertEquals(1000, data.getBootyNeededForNextRank());
 	}
 
 	@Test
@@ -121,16 +121,16 @@ public class PirateRankDataTest
 		PirateRankData data = new PirateRankData();
 		
 		// Add enough to reach max rank
-		data.addBooty(10000000);
+		data.addBooty(Integer.MAX_VALUE);
 		
-		assertEquals(PirateRank.WISE_OLD_PIRATE, data.getCurrentRank());
+		assertEquals(PirateRank.RANK_100, data.getCurrentRank());
 		assertEquals(1.0, data.getProgressToNextRank(), 0.001);
 		assertEquals(0, data.getBootyNeededForNextRank());
 		
 		// Adding more booty shouldn't rank up
 		boolean rankedUp = data.addBooty(1000000);
 		assertFalse(rankedUp);
-		assertEquals(PirateRank.WISE_OLD_PIRATE, data.getCurrentRank());
+		assertEquals(PirateRank.RANK_100, data.getCurrentRank());
 	}
 
 	@Test
@@ -148,10 +148,10 @@ public class PirateRankDataTest
 	@Test
 	public void testDeserializationConstructor()
 	{
-		PirateRankData data = new PirateRankData(50000, PirateRank.QUARTERMASTER);
+		PirateRankData data = new PirateRankData(50000, PirateRank.RANK_20);
 		
 		assertEquals(50000, data.getTotalBooty());
-		assertEquals(PirateRank.QUARTERMASTER, data.getCurrentRank());
+		assertEquals(PirateRank.RANK_20, data.getCurrentRank());
 		assertNull(data.getPreviousRank());
 		assertFalse(data.isJustRankedUp());
 	}
