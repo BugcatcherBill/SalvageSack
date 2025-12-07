@@ -145,10 +145,10 @@ public class PirateRankPanel extends JPanel
 			NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
 			bootyLabel.setText("Booty: " + numberFormat.format(rankData.getTotalBooty()) + " gp");
 
-			// Update progress bar with rank's arc color
+			// Update progress bar with rank's progress bar color
 			double progress = rankData.getProgressToNextRank();
 			progressBar.setValue((int) (progress * 1000));
-			progressBar.setForeground(rank.getArcColor());
+			progressBar.setForeground(rank.getProgressBarColor());
 
 			// Update progress label
 			PirateRank nextRank = rank.getNextRank();
