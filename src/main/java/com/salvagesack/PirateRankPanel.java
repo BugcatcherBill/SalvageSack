@@ -62,11 +62,13 @@ public class PirateRankPanel extends JPanel
 		rankTitleLabel.setForeground(Color.WHITE);
 		rankTitleLabel.setFont(new Font("Serif", Font.BOLD, 18));
 		rankTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		rankTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		rankDescriptionLabel = new JLabel("Cast ashore with nothing");
 		rankDescriptionLabel.setForeground(Color.LIGHT_GRAY);
 		rankDescriptionLabel.setFont(new Font("Arial", Font.ITALIC, 11));
 		rankDescriptionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		rankDescriptionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		bootyLabel = new JLabel("Booty: 0 gp");
 		bootyLabel.setForeground(new Color(218, 165, 32));
@@ -330,7 +332,7 @@ public class PirateRankPanel extends JPanel
 		// Try to load the icon
 		try
 		{
-			String iconPath = "/icons/pirate_ranks/" + iconFileName;
+			String iconPath = "/PirateRankIcons/" + iconFileName;
 			BufferedImage icon = ImageUtil.loadImageResource(getClass(), iconPath);
 			if (icon != null)
 			{
