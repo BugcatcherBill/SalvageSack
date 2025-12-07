@@ -134,7 +134,7 @@ public class SalvageSackPlugin extends Plugin
 		BufferedImage icon;
 		try
 		{
-			icon = ImageUtil.loadImageResource(getClass(), "/icon.png");
+			icon = ImageUtil.loadImageResource(getClass(), "/plugin-icon.png");
 		}
 		catch (Exception e)
 		{

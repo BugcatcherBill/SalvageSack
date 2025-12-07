@@ -2,14 +2,18 @@ package com.salvagesack;
 
 import lombok.Setter;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Panel that displays pirate rank progression with a circular dial and progress bar
@@ -17,10 +21,8 @@ import java.util.Locale;
 public class PirateRankPanel extends JPanel
 {
 	private static final int DIAL_SIZE = 120;
-	private static final Color PROGRESS_FILL = new Color(218, 165, 32); // Gold (like RuneScape gold coins)
-	private static final Color PROGRESS_BACKGROUND = new Color(60, 60, 60);
-	private static final Color BORDER_COLOR = new Color(139, 69, 19); // Brown (like treasure chest wood)
 	private static final Color RANK_UP_COLOR = new Color(255, 215, 0); // Bright gold (level up glow)
+	private static final Map<String, BufferedImage> iconCache = new HashMap<>();
 
 	@Setter
 	private PirateRankData rankData;
@@ -93,8 +95,8 @@ public class PirateRankPanel extends JPanel
 		progressBar.setStringPainted(false);
 		progressBar.setPreferredSize(new Dimension(200, 20));
 		progressBar.setMaximumSize(new Dimension(200, 20));
-		progressBar.setBackground(PROGRESS_BACKGROUND);
-		progressBar.setForeground(PROGRESS_FILL);
+		progressBar.setBackground(new Color(60, 60, 60));
+		progressBar.setForeground(new Color(218, 165, 32));
 		progressBar.setBorderPainted(true);
 		progressBar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -141,9 +143,10 @@ public class PirateRankPanel extends JPanel
 			NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
 			bootyLabel.setText("Booty: " + numberFormat.format(rankData.getTotalBooty()) + " gp");
 
-			// Update progress bar
+			// Update progress bar with rank's arc color
 			double progress = rankData.getProgressToNextRank();
 			progressBar.setValue((int) (progress * 1000));
+			progressBar.setForeground(rank.getArcColor());
 
 			// Update progress label
 			PirateRank nextRank = rank.getNextRank();
@@ -229,6 +232,17 @@ public class PirateRankPanel extends JPanel
 			int x = centerX - diameter / 2;
 			int y = centerY - diameter / 2;
 
+			// Get current rank colors
+			Color circleColor = new Color(139, 69, 19); // Default brown
+			Color arcColor = new Color(218, 165, 32); // Default gold
+			
+			if (rankData != null)
+			{
+				PirateRank rank = rankData.getCurrentRank();
+				circleColor = rank.getCircleColor();
+				arcColor = rank.getArcColor();
+			}
+
 			// Draw background circle
 			g2d.setColor(new Color(40, 40, 40));
 			g2d.fill(new Ellipse2D.Double(x, y, diameter, diameter));
@@ -239,15 +253,15 @@ public class PirateRankPanel extends JPanel
 				double progress = rankData.getProgressToNextRank();
 				double angle = 360.0 * progress;
 
-				// Draw progress arc
-				g2d.setColor(PROGRESS_FILL);
+				// Draw progress arc using rank's arc color
+				g2d.setColor(arcColor);
 				g2d.setStroke(new BasicStroke(6));
 				Arc2D.Double arc = new Arc2D.Double(x, y, diameter, diameter, 90, -angle, Arc2D.OPEN);
 				g2d.draw(arc);
 			}
 
-			// Draw border
-			g2d.setColor(BORDER_COLOR);
+			// Draw border using rank's circle color
+			g2d.setColor(circleColor);
 			g2d.setStroke(new BasicStroke(3));
 			g2d.draw(new Ellipse2D.Double(x, y, diameter, diameter));
 
@@ -264,21 +278,73 @@ public class PirateRankPanel extends JPanel
 				g2d.draw(new Ellipse2D.Double(x - 2, y - 2, diameter + 4, diameter + 4));
 			}
 
-			// Draw rank icon text (placeholder - could be replaced with actual icons)
+			// Draw rank icon
 			if (rankData != null)
 			{
 				PirateRank rank = rankData.getCurrentRank();
-				String rankOrdinal = String.valueOf(rank.ordinal() + 1);
+				BufferedImage icon = loadRankIcon(rank.getIconFileName());
 				
-				g2d.setColor(Color.WHITE);
-				g2d.setFont(new Font("Serif", Font.BOLD, 36));
-				FontMetrics fm = g2d.getFontMetrics();
-				int textWidth = fm.stringWidth(rankOrdinal);
-				int textHeight = fm.getAscent();
-				g2d.drawString(rankOrdinal, centerX - textWidth / 2, centerY + textHeight / 2);
+				if (icon != null)
+				{
+					// Draw icon centered in the dial
+					int iconSize = diameter - 30; // Leave some padding
+					int iconX = centerX - iconSize / 2;
+					int iconY = centerY - iconSize / 2;
+					g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+				}
+				else
+				{
+					// Fallback: draw rank number if icon not available
+					String rankOrdinal = String.valueOf(rank.ordinal() + 1);
+					g2d.setColor(Color.WHITE);
+					g2d.setFont(new Font("Serif", Font.BOLD, 36));
+					FontMetrics fm = g2d.getFontMetrics();
+					int textWidth = fm.stringWidth(rankOrdinal);
+					int textHeight = fm.getAscent();
+					g2d.drawString(rankOrdinal, centerX - textWidth / 2, centerY + textHeight / 2);
+				}
 			}
 
 			g2d.dispose();
 		}
+	}
+
+	/**
+	 * Load a rank icon from resources with caching
+	 * @param iconFileName The icon file name
+	 * @return The icon image, or null if not found
+	 */
+	private BufferedImage loadRankIcon(String iconFileName)
+	{
+		if (iconFileName == null || iconFileName.isEmpty())
+		{
+			return null;
+		}
+
+		// Check cache first
+		if (iconCache.containsKey(iconFileName))
+		{
+			return iconCache.get(iconFileName);
+		}
+
+		// Try to load the icon
+		try
+		{
+			String iconPath = "/icons/pirate_ranks/" + iconFileName;
+			BufferedImage icon = ImageUtil.loadImageResource(getClass(), iconPath);
+			if (icon != null)
+			{
+				iconCache.put(iconFileName, icon);
+				return icon;
+			}
+		}
+		catch (Exception e)
+		{
+			// Icon not found, return null (will use fallback rendering)
+		}
+
+		// Cache the null result to avoid repeated load attempts
+		iconCache.put(iconFileName, null);
+		return null;
 	}
 }
