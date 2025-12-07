@@ -7,6 +7,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -184,6 +185,24 @@ public class SalvageSackPlugin extends Plugin
 		if (navButton != null)
 		{
 			clientToolbar.removeNavigation(navButton);
+		}
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (!"salvagesack".equals(event.getGroup()))
+		{
+			return;
+		}
+
+		// Rebuild panel when pirate ranks config changes
+		if ("enablePirateRanks".equals(event.getKey()))
+		{
+			if (panel != null)
+			{
+				panel.updateData(salvageDataMap);
+			}
 		}
 	}
 
