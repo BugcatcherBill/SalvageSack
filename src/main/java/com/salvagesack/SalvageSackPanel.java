@@ -25,8 +25,19 @@ import java.util.function.Consumer;
  * <p>
  * The panel includes sorting controls that allow users to organize items
  * by different criteria including alphabetical order, current drop rate,
- * expected drop rate, and quantity. Sort direction can be toggled between
- * ascending and descending.
+ * expected drop rate, quantity, and luck (based on rate comparison).
+ * Sort direction can be toggled between ascending and descending.
+ * </p>
+ * <p>
+ * Luck sorting orders items by comparing current drop rate to expected rate:
+ * <ul>
+ *   <li>Green (lucky) - receiving items more often than expected (ratio ≥ 1.1)</li>
+ *   <li>Yellow (neutral) - receiving items at expected rate (0.9 ≤ ratio < 1.1)</li>
+ *   <li>Red (unlucky) - receiving items less often than expected (ratio < 0.9)</li>
+ *   <li>Unknown - no expected rate data available</li>
+ * </ul>
+ * Descending order shows: Green → Yellow → Red → Unknown<br>
+ * Ascending order shows: Red → Yellow → Green → Unknown
  * </p>
  */
 @Slf4j
@@ -41,7 +52,6 @@ public class SalvageSackPanel extends PluginPanel
 
 	private final JPanel contentPanel;
 	private final ItemIconManager iconManager;
-	private final SalvageSackConfig config;
 	private final Map<ShipwreckType, Boolean> expandedState = new HashMap<>();
 	private final JLabel totalOpensLabel;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
@@ -64,7 +74,6 @@ public class SalvageSackPanel extends PluginPanel
 	{
 		super(false);
 		this.iconManager = iconManager;
-		this.config = config;
 		this.currentSortOption = config.sortOption();
 		this.currentSortDescending = config.sortDescending();
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
@@ -72,36 +81,37 @@ public class SalvageSackPanel extends PluginPanel
 
 		JPanel titlePanel = new JPanel(new BorderLayout());
 		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		titlePanel.setBorder(new EmptyBorder(10, 12, 10, 12));
+		titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		// Right side: Stats and controls organized in a grid
+		// Main content panel that fills the space
 		JPanel infoPanel = new JPanel(new GridBagLayout());
 		infoPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 8, 0, 0);
-		
-		// Total salvage label
-		totalOpensLabel = new JLabel("0 Total Salvage Sorted");
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		gbc.anchor = GridBagConstraints.CENTER;
+
+		// Total salvage label - full width
+		totalOpensLabel = new JLabel("0 Total Salvage Sorted", SwingConstants.CENTER);
 		totalOpensLabel.setForeground(Color.WHITE);
-		totalOpensLabel.setFont(new Font("Arial", Font.BOLD, 11));
-		
+		totalOpensLabel.setFont(new Font("Arial", Font.BOLD, 12));
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 2;
-		gbc.insets = new Insets(0, 0, 4, 0);
+		gbc.insets = new Insets(0, 0, 8, 0);
 		infoPanel.add(totalOpensLabel, gbc);
 		
-		// Sort dropdown
+		// Sort dropdown - expands to fill available space
 		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
 		sortComboBox.setSelectedItem(currentSortOption);
 		sortComboBox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		sortComboBox.setForeground(Color.WHITE);
-		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 10));
+		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 11));
 		sortComboBox.setFocusable(false);
 		sortComboBox.setBorder(new CompoundBorder(
 			new LineBorder(ColorScheme.MEDIUM_GRAY_COLOR, 1),
-			new EmptyBorder(2, 4, 2, 4)
+			new EmptyBorder(4, 8, 4, 8)
 		));
 		sortComboBox.addActionListener(e -> {
 			SortOption selected = (SortOption) sortComboBox.getSelectedItem();
@@ -119,13 +129,14 @@ public class SalvageSackPanel extends PluginPanel
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
+		gbc.weightx = 1.0;
 		gbc.insets = new Insets(0, 0, 0, 4);
 		infoPanel.add(sortComboBox, gbc);
 		
-		// Sort direction button
+		// Sort direction button - fixed width
 		JButton sortDirectionButton = new JButton(currentSortDescending ? "↓" : "↑");
-		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 14));
-		sortDirectionButton.setPreferredSize(new Dimension(28, 24));
+		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 16));
+		sortDirectionButton.setPreferredSize(new Dimension(40, 32));
 		sortDirectionButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		sortDirectionButton.setForeground(Color.WHITE);
 		sortDirectionButton.setFocusable(false);
@@ -156,10 +167,11 @@ public class SalvageSackPanel extends PluginPanel
 		
 		gbc.gridx = 1;
 		gbc.gridy = 1;
+		gbc.weightx = 0.0;
 		gbc.insets = new Insets(0, 0, 0, 0);
 		infoPanel.add(sortDirectionButton, gbc);
 		
-		titlePanel.add(infoPanel, BorderLayout.EAST);
+		titlePanel.add(infoPanel, BorderLayout.CENTER);
 
 		add(titlePanel, BorderLayout.NORTH);
 
@@ -436,7 +448,19 @@ public class SalvageSackPanel extends PluginPanel
 
 	/**
 	 * Returns a sorted list of SalvageItems based on the current sort option and direction.
-	 * Sorting can be by alphabetical order, current drop rate, expected drop rate, or quantity.
+	 * <p>
+	 * Sorting options:
+	 * <ul>
+	 *   <li>ALPHABETICAL - Sort by item name</li>
+	 *   <li>CURRENT_RATE - Sort by actual drop rate from player's data</li>
+	 *   <li>EXPECTED_RATE - Sort by wiki-sourced expected drop rate</li>
+	 *   <li>QUANTITY - Sort by total quantity received</li>
+	 *   <li>LUCK - Sort by luck ratio (current rate / expected rate), color-coded green/yellow/red</li>
+	 * </ul>
+	 * Sort direction (ascending/descending) is applied after the comparator is selected.
+	 *
+	 * @param data The salvage data containing items to sort
+	 * @return Sorted list of SalvageItems
 	 */
 	private List<SalvageItem> getSortedItems(SalvageData data)
 	{
@@ -461,7 +485,11 @@ public class SalvageSackPanel extends PluginPanel
 			case QUANTITY:
 				comparator = Comparator.comparingInt(SalvageItem::getTotalQuantity);
 				break;
-			
+
+			case LUCK:
+				comparator = Comparator.comparingInt(item -> getLuckScore(item, data.getTotalLoots()));
+				break;
+
 			default:
 				comparator = Comparator.comparing(SalvageItem::getItemName);
 				break;
@@ -476,6 +504,24 @@ public class SalvageSackPanel extends PluginPanel
 		return items;
 	}
 
+	/**
+	 * Determines the luck color for an item based on its current vs expected drop rate.
+	 * <p>
+	 * Uses a gradient system to provide smooth color transitions:
+	 * <ul>
+	 *   <li>Pure Green (ratio ≥ 1.5): Maximum luck - getting items much more often</li>
+	 *   <li>Green-Yellow Gradient (1.1 ≤ ratio < 1.5): Good luck - interpolated color</li>
+	 *   <li>Pure Yellow (0.9 ≤ ratio < 1.1): Neutral - close to expected rate</li>
+	 *   <li>Yellow-Red Gradient (0.5 ≤ ratio < 0.9): Bad luck - interpolated color</li>
+	 *   <li>Pure Red (ratio < 0.5): Worst luck - getting items much less often</li>
+	 *   <li>Gray: Unknown - no expected rate data available</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param currentRate the player's actual drop rate
+	 * @param expectedRate the wiki-sourced expected drop rate
+	 * @return Color representing the luck level
+	 */
 	private Color getLuckColor(double currentRate, double expectedRate)
 	{
 		if (expectedRate <= 0)
@@ -506,6 +552,76 @@ public class SalvageSackPanel extends PluginPanel
 		else
 		{
 			return LUCK_BAD;
+		}
+	}
+
+	/**
+	 * Get luck score for sorting items by luck (current rate vs expected rate).
+	 * <p>
+	 * Aligns with the color gradient logic from {@link #getLuckColor(double, double)}
+	 * for consistent sorting and visual representation.
+	 * </p>
+	 * <p>
+	 * Scoring system:
+	 * <ul>
+	 *   <li>Pure Green (ratio ≥ 1.5): Score 1000 - Best luck</li>
+	 *   <li>Green-Yellow Gradient (1.1 ≤ ratio < 1.5): Scores 600-999 - Good luck</li>
+	 *   <li>Pure Yellow (0.9 ≤ ratio < 1.1): Score 500 - Neutral/Expected</li>
+	 *   <li>Yellow-Red Gradient (0.5 ≤ ratio < 0.9): Scores 100-499 - Bad luck</li>
+	 *   <li>Pure Red (ratio < 0.5): Score 0 - Worst luck</li>
+	 *   <li>Unknown (no expected rate): Score Integer.MIN_VALUE - Always last</li>
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * Sort behavior:
+	 * <ul>
+	 *   <li>Descending: Green → Green-Yellow → Yellow → Yellow-Red → Red → Unknown</li>
+	 *   <li>Ascending: Red → Yellow-Red → Yellow → Green-Yellow → Green → Unknown</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param item the salvage item to score
+	 * @param totalLoots total number of loots to calculate current drop rate
+	 * @return score based on luck ratio (higher = better luck)
+	 */
+	private int getLuckScore(SalvageItem item, int totalLoots)
+	{
+		double currentRate = item.getCurrentDropRate(totalLoots);
+		double expectedRate = item.getExpectedDropRate();
+
+		if (expectedRate <= 0)
+		{
+			return Integer.MIN_VALUE; // Unknown items go last in both directions
+		}
+
+		double luckRatio = currentRate / expectedRate;
+
+		// Pure green (best luck): ratio >= 1.5
+		if (luckRatio >= 1.5)
+		{
+			return 1000;
+		}
+		// Green-yellow gradient: 1.1 <= ratio < 1.5
+		else if (luckRatio >= 1.1)
+		{
+			// Map 1.1-1.5 to scores 600-999
+			return 600 + (int)((luckRatio - 1.1) / 0.4 * 399);
+		}
+		// Pure yellow (neutral): 0.9 <= ratio < 1.1
+		else if (luckRatio >= 0.9)
+		{
+			return 500;
+		}
+		// Yellow-red gradient: 0.5 <= ratio < 0.9
+		else if (luckRatio >= 0.5)
+		{
+			// Map 0.5-0.9 to scores 100-499
+			return 100 + (int)((luckRatio - 0.5) / 0.4 * 399);
+		}
+		// Pure red (worst luck): ratio < 0.5
+		else
+		{
+			return 0;
 		}
 	}
 

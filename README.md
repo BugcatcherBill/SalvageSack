@@ -71,6 +71,9 @@ Items within each shipwreck section can be sorted by:
 - **Current Rate**: Sort by your actual drop rate
 - **Expected Rate**: Sort by the wiki expected drop rate
 - **Quantity**: Sort by total quantity received
+- **Luck**: Sort by luck (how your drop rate compares to expected)
+  - Descending: Shows luckiest items (green) first, then neutral (yellow), then unlucky (red)
+  - Ascending: Shows unlucky items (red) first, then neutral (yellow), then lucky (green)
 
 Click the arrow button (↑/↓) to toggle between ascending and descending order. Your sort preference is automatically saved.
 
