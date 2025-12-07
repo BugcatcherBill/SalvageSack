@@ -288,10 +288,13 @@ public class PirateRankPanel extends JPanel
 				
 				if (icon != null)
 				{
-					// Draw icon centered in the dial
-					int iconSize = diameter - 30; // Leave some padding
-					int iconX = centerX - iconSize / 2;
-					int iconY = centerY - iconSize / 2;
+					// Draw icon centered in the dial with more precise centering
+					int iconSize = diameter - 30; // Leave some padding from the arc
+					// Use floating point for precise centering, then convert to int
+					double iconXDouble = centerX - (iconSize / 2.0);
+					double iconYDouble = centerY - (iconSize / 2.0);
+					int iconX = (int) Math.round(iconXDouble);
+					int iconY = (int) Math.round(iconYDouble);
 					g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
 				}
 				else
