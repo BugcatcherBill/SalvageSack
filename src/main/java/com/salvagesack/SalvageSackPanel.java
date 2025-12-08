@@ -59,7 +59,7 @@ public class SalvageSackPanel extends PluginPanel
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
 	private SortOption currentSortOption;
 	private boolean currentSortDescending;
-	private PirateRankPanel pirateRankPanel;
+	private final PirateRankPanel pirateRankPanel;
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
