@@ -23,8 +23,8 @@ public enum PirateRank
 	RANK_5(704679, "Cabin Boy", "Fetching grog", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_6(1231025, "Bilge Rat", "Working the depths", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_7(1941869, "Powder Monkey", "Handling cannons", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_8(2854874, "Galley Hand", "Peeling potatoes", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_9(3986271, "Ship's Cook", "Burnt fish specialist", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_8(2854874, "Galley Hand", "Peeling potatoes", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_9(3986271, "Ship's Cook", "Burnt fish specialist", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_10(5351162, "Able Seaman", "Competent sailor", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	
 	// Ranks 11-20: Building Skills (5.3M - 34.6M)
