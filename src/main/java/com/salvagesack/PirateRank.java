@@ -17,12 +17,12 @@ public enum PirateRank
 {
 	// Ranks 1-10: Quick Start (0 - 5.3M) - Immediate engagement
 	RANK_1(0, "Castaway", "Washed up in Lumbridge", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_2(22021, "Beachcomber", "Collecting seashells", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_3(124570, "Deck Swabber", "Cleaning barnacles", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_4(343277, "Rope Hauler", "Learning the ropes", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_5(704679, "Cabin Boy", "Fetching grog", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_6(1231025, "Bilge Rat", "Working the depths", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_7(1941869, "Powder Monkey", "Handling cannons", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_2(22021, "Beachcomber", "Collecting seashells", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_3(124570, "Deck Swabber", "Cleaning barnacles", "Rank3.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_4(343277, "Rope Hauler", "Learning the ropes", "Rank4.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_5(704679, "Cabin Boy", "Fetching grog", "Rank5.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_6(1231025, "Bilge Rat", "Working the depths", "Rank6.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_7(1941869, "Powder Monkey", "Handling cannons", "Rank6.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_8(2854874, "Galley Hand", "Peeling potatoes", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_9(3986271, "Ship's Cook", "Burnt fish specialist", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_10(5351162, "Able Seaman", "Competent sailor", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
