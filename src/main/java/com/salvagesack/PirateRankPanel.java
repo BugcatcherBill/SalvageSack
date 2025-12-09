@@ -330,12 +330,12 @@ public class PirateRankPanel extends JPanel
 		String rankNumber = String.valueOf(rank.ordinal() + 1);
 		int rankNum = rank.ordinal() + 1;
 		
-		// Calculate badge position (top-right area of the dial)
-		double angle = Math.toRadians(45); // 45 degrees from top (top-right position)
-		int radius = diameter / 2;
-		int badgeDistance = (int) (radius * 0.7); // Position badge 70% out from center
-		int badgeCenterX = centerX + (int) (badgeDistance * Math.sin(angle));
-		int badgeCenterY = centerY - (int) (badgeDistance * Math.cos(angle));
+		// Calculate icon size (same as in paintComponent)
+		int iconSize = diameter - 30;
+		
+		// Position badge centered horizontally, below the icon
+		int badgeCenterX = centerX;
+		int badgeCenterY = centerY + (iconSize / 2) + 18; // Below icon with small gap
 		
 		// Determine badge size based on rank number digits
 		int badgeSize = rankNum < 10 ? 24 : (rankNum < 100 ? 28 : 32);
