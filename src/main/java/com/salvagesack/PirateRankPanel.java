@@ -288,17 +288,17 @@ public class PirateRankPanel extends JPanel
 				
 				if (icon != null)
 				{
-					// Draw icon centered in the dial with more precise centering
-					int iconSize = diameter - 30; // Leave some padding from the arc
-					// Use floating point for precise centering, then convert to int
+					// Draw smaller icon centered in upper portion of dial
+					int iconSize = diameter - 60; // Smaller icon to leave room for badge
+					// Position icon in upper half of the dial
 					double iconXDouble = centerX - (iconSize / 2.0);
-					double iconYDouble = centerY - (iconSize / 2.0);
+					double iconYDouble = centerY - (iconSize / 2.0) - 15; // Shift up slightly
 					int iconX = (int) Math.round(iconXDouble);
 					int iconY = (int) Math.round(iconYDouble);
 					g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
 					
-					// Draw rank number badge in top-right corner of the dial
-					drawRankNumberBadge(g2d, rank, centerX, centerY, diameter);
+					// Draw rank number badge below icon, inside the progress arc
+					drawRankNumberBadge(g2d, rank, centerX, centerY, iconSize, iconY);
 				}
 				else
 				{
@@ -323,9 +323,10 @@ public class PirateRankPanel extends JPanel
 	 * @param rank Current pirate rank
 	 * @param centerX Center X coordinate of dial
 	 * @param centerY Center Y coordinate of dial
-	 * @param diameter Diameter of the dial
+	 * @param iconSize Size of the icon
+	 * @param iconY Y position of the icon
 	 */
-	private void drawRankNumberBadge(Graphics2D g2d, PirateRank rank, int centerX, int centerY, int diameter)
+	private void drawRankNumberBadge(Graphics2D g2d, PirateRank rank, int centerX, int centerY, int iconSize, int iconY)
 	{
 		String rankNumber = String.valueOf(rank.ordinal() + 1);
 		int rankNum = rank.ordinal() + 1;
@@ -333,13 +334,9 @@ public class PirateRankPanel extends JPanel
 		// Determine badge size based on rank number digits
 		int badgeSize = rankNum < 10 ? 24 : (rankNum < 100 ? 28 : 32);
 		
-		// Position badge centered horizontally, below the arc
-		// The arc extends to diameter/2 radius from center, plus stroke width
+		// Position badge centered horizontally, below the icon but still inside the arc
 		int badgeCenterX = centerX;
-		int arcRadius = diameter / 2;
-		int strokeWidth = 6; // Progress arc stroke width from paintComponent
-		int gapBelowArc = badgeSize / 2 + 5; // Enough space for half the badge plus padding
-		int badgeCenterY = centerY + arcRadius + strokeWidth + gapBelowArc;
+		int badgeCenterY = iconY + iconSize + 18; // 18px below icon
 		
 		// Draw badge background (circular)
 		g2d.setColor(new Color(40, 40, 40, 220)); // Semi-transparent dark background
