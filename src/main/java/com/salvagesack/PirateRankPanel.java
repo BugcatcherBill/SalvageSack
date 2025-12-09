@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class PirateRankPanel extends JPanel
 {
-	private static final int DIAL_SIZE = 120;
+	private static final int DIAL_SIZE = 150;
 	private static final Color RANK_UP_COLOR = new Color(255, 215, 0); // Bright gold (level up glow)
 	private static final Map<String, BufferedImage> iconCache = new HashMap<>();
 
@@ -330,15 +330,16 @@ public class PirateRankPanel extends JPanel
 		String rankNumber = String.valueOf(rank.ordinal() + 1);
 		int rankNum = rank.ordinal() + 1;
 		
-		// Calculate icon size (same as in paintComponent)
-		int iconSize = diameter - 30;
-		
-		// Position badge centered horizontally, below the icon
-		int badgeCenterX = centerX;
-		int badgeCenterY = centerY + (iconSize / 2) + 18; // Below icon with small gap
-		
 		// Determine badge size based on rank number digits
 		int badgeSize = rankNum < 10 ? 24 : (rankNum < 100 ? 28 : 32);
+		
+		// Position badge centered horizontally, below the arc
+		// The arc extends to diameter/2 radius from center, plus stroke width
+		int badgeCenterX = centerX;
+		int arcRadius = diameter / 2;
+		int strokeWidth = 6; // Progress arc stroke width from paintComponent
+		int gapBelowArc = badgeSize / 2 + 5; // Enough space for half the badge plus padding
+		int badgeCenterY = centerY + arcRadius + strokeWidth + gapBelowArc;
 		
 		// Draw badge background (circular)
 		g2d.setColor(new Color(40, 40, 40, 220)); // Semi-transparent dark background
