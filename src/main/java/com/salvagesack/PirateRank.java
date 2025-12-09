@@ -16,12 +16,18 @@ import java.awt.Color;
 public enum PirateRank
 {
 	// Ranks 1-10: Quick Start (0 - 5.3M) - Immediate engagement
-	RANK_1(0, "Castaway", "Washed up in Lumbridge", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_2(22021, "Beachcomber", "Collecting seashells", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_3(124570, "Deck Swabber", "Cleaning barnacles", "Rank3.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_4(343277, "Rope Hauler", "Learning the ropes", "Rank4.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_5(704679, "Cabin Boy", "Fetching grog", "Rank5.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_6(1231025, "Bilge Rat", "Working the depths", "Rank6.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	// Rank 1: Warm sandy brown with golden yellow (beach/castaway theme)
+	RANK_1(0, "Castaway", "Washed up in Lumbridge", "Rank1.png", new Color(139, 90, 43), new Color(255, 215, 0), new Color(255, 215, 0)),
+	// Rank 2: Ocean teal with bright aqua (beachcomber/sea shell theme)
+	RANK_2(22021, "Beachcomber", "Collecting seashells", "Rank2.png", new Color(30, 144, 155), new Color(127, 255, 212), new Color(127, 255, 212)),
+	// Rank 3: Deep navy with silver-blue (deck work/nautical theme)
+	RANK_3(124570, "Deck Swabber", "Cleaning barnacles", "Rank3.png", new Color(25, 25, 112), new Color(176, 196, 222), new Color(176, 196, 222)),
+	// Rank 4: Rich mahogany with amber (rope/wood theme)
+	RANK_4(343277, "Rope Hauler", "Learning the ropes", "Rank4.png", new Color(128, 64, 64), new Color(255, 191, 0), new Color(255, 191, 0)),
+	// Rank 5: Dark olive with lime green (cabin boy/grog theme)
+	RANK_5(704679, "Cabin Boy", "Fetching grog", "Rank5.png", new Color(85, 107, 47), new Color(173, 255, 47), new Color(173, 255, 47)),
+	// Rank 6: Dark slate with coral orange (bilge/depths theme)
+	RANK_6(1231025, "Bilge Rat", "Working the depths", "Rank6.png", new Color(47, 79, 79), new Color(255, 127, 80), new Color(255, 127, 80)),
 	RANK_7(1941869, "Powder Monkey", "Handling cannons", "Rank6.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_8(2854874, "Galley Hand", "Peeling potatoes", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_9(3986271, "Ship's Cook", "Burnt fish specialist", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
