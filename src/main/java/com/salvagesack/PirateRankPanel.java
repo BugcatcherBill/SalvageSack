@@ -296,6 +296,9 @@ public class PirateRankPanel extends JPanel
 					int iconX = (int) Math.round(iconXDouble);
 					int iconY = (int) Math.round(iconYDouble);
 					g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+					
+					// Draw rank number badge in top-right corner of the dial
+					drawRankNumberBadge(g2d, rank, centerX, centerY, diameter);
 				}
 				else
 				{
@@ -312,6 +315,51 @@ public class PirateRankPanel extends JPanel
 
 			g2d.dispose();
 		}
+	}
+
+	/**
+	 * Draw rank number badge in a subtle, visually appealing way
+	 * @param g2d Graphics context
+	 * @param rank Current pirate rank
+	 * @param centerX Center X coordinate of dial
+	 * @param centerY Center Y coordinate of dial
+	 * @param diameter Diameter of the dial
+	 */
+	private void drawRankNumberBadge(Graphics2D g2d, PirateRank rank, int centerX, int centerY, int diameter)
+	{
+		String rankNumber = String.valueOf(rank.ordinal() + 1);
+		int rankNum = rank.ordinal() + 1;
+		
+		// Calculate badge position (top-right area of the dial)
+		double angle = Math.toRadians(45); // 45 degrees from top (top-right position)
+		int radius = diameter / 2;
+		int badgeDistance = (int) (radius * 0.7); // Position badge 70% out from center
+		int badgeCenterX = centerX + (int) (badgeDistance * Math.sin(angle));
+		int badgeCenterY = centerY - (int) (badgeDistance * Math.cos(angle));
+		
+		// Determine badge size based on rank number digits
+		int badgeSize = rankNum < 10 ? 24 : (rankNum < 100 ? 28 : 32);
+		
+		// Draw badge background (circular)
+		g2d.setColor(new Color(40, 40, 40, 220)); // Semi-transparent dark background
+		g2d.fillOval(badgeCenterX - badgeSize / 2, badgeCenterY - badgeSize / 2, badgeSize, badgeSize);
+		
+		// Draw badge border with rank's arc color for subtle tie-in
+		Color borderColor = rank.getArcColor();
+		g2d.setColor(new Color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), 200));
+		g2d.setStroke(new BasicStroke(2));
+		g2d.drawOval(badgeCenterX - badgeSize / 2, badgeCenterY - badgeSize / 2, badgeSize, badgeSize);
+		
+		// Draw rank number
+		g2d.setColor(new Color(255, 215, 0)); // Gold color for the number
+		Font badgeFont = new Font("Arial", Font.BOLD, rankNum < 10 ? 12 : (rankNum < 100 ? 11 : 10));
+		g2d.setFont(badgeFont);
+		FontMetrics fm = g2d.getFontMetrics();
+		int textWidth = fm.stringWidth(rankNumber);
+		int textHeight = fm.getAscent();
+		int textX = badgeCenterX - textWidth / 2;
+		int textY = badgeCenterY + textHeight / 2 - fm.getDescent() / 2;
+		g2d.drawString(rankNumber, textX, textY);
 	}
 
 	/**
