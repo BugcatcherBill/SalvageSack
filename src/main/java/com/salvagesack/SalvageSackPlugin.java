@@ -135,7 +135,7 @@ public class SalvageSackPlugin extends Plugin
 		BufferedImage icon;
 		try
 		{
-			icon = ImageUtil.loadImageResource(getClass(), "/plugin-icon.png");
+			icon = ImageUtil.loadImageResource(getClass(), "/icon.png");
 		}
 		catch (Exception e)
 		{
@@ -287,7 +287,8 @@ public class SalvageSackPlugin extends Plugin
 			}
 
 			// Update the panel
-			panel.updateData(salvageDataMap);
+            assert panel != null;
+            panel.updateData(salvageDataMap);
 
 			// Save data
 			dataManager.saveData(salvageDataMap);
