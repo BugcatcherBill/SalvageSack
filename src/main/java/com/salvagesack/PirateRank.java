@@ -28,7 +28,7 @@ public enum PirateRank
 	RANK_5(704679, "Cabin Boy", "Fetching grog", "Rank5.png", new Color(85, 107, 47), new Color(173, 255, 47), new Color(173, 255, 47)),
 	// Rank 6: Dark slate with coral orange (bilge/depths theme)
 	RANK_6(1231025, "Bilge Rat", "Working the depths", "Rank6.png", new Color(47, 79, 79), new Color(255, 127, 80), new Color(255, 127, 80)),
-	RANK_7(1941869, "Powder Monkey", "Handling cannons", "Rank6.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_7(1941869, "Powder Monkey", "Handling cannons", "Rank10.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_8(2854874, "Galley Hand", "Peeling potatoes", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_9(3986271, "Ship's Cook", "Burnt fish specialist", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_10(5351162, "Able Seaman", "Competent sailor", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
