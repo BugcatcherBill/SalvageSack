@@ -19,45 +19,68 @@ public enum PirateRank
 	// Rank 1: Warm sandy brown with golden yellow (beach/castaway theme)
 	RANK_1(0, "Castaway", "Washed up in Lumbridge", "Rank1.png", new Color(139, 90, 43), new Color(255, 215, 0), new Color(255, 215, 0)),
 	// Rank 2: Ocean teal with bright aqua (beachcomber/sea shell theme)
-	RANK_2(22021, "Beachcomber", "Collecting seashells", "Rank2.png", new Color(30, 144, 155), new Color(127, 255, 212), new Color(127, 255, 212)),
+	RANK_2(22021, "Barnacle Scraper", "Hey someone has to do it", "Rank2.png", new Color(30, 144, 155), new Color(127, 255, 212), new Color(127, 255, 212)),
 	// Rank 3: Deep navy with silver-blue (deck work/nautical theme)
-	RANK_3(124570, "Deck Swabber", "Cleaning barnacles", "Rank3.png", new Color(25, 25, 112), new Color(176, 196, 222), new Color(176, 196, 222)),
+	RANK_3(124570, "Landlubber", "Hates open ocean", "Rank3.png", new Color(25, 25, 112), new Color(176, 196, 222), new Color(176, 196, 222)),
 	// Rank 4: Rich mahogany with amber (rope/wood theme)
-	RANK_4(343277, "Rope Hauler", "Learning the ropes", "Rank4.png", new Color(128, 64, 64), new Color(255, 191, 0), new Color(255, 191, 0)),
+	RANK_4(343277, "Driftwood", "Useless, but maybe not someday", "Rank4.png", new Color(128, 64, 64), new Color(255, 191, 0), new Color(255, 191, 0)),
 	// Rank 5: Dark olive with lime green (cabin boy/grog theme)
-	RANK_5(704679, "Cabin Boy", "Fetching grog", "Rank5.png", new Color(85, 107, 47), new Color(173, 255, 47), new Color(173, 255, 47)),
+	RANK_5(704679, "Stowaway", "You were never here", "Rank5.png", new Color(85, 107, 47), new Color(173, 255, 47), new Color(173, 255, 47)),
 	// Rank 6: Dark slate with coral orange (bilge/depths theme)
-	RANK_6(1231025, "Bilge Rat", "Working the depths", "Rank6.png", new Color(47, 79, 79), new Color(255, 127, 80), new Color(255, 127, 80)),
-	RANK_7(1941869, "Powder Monkey", "Handling cannons", "Rank10.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_8(2854874, "Galley Hand", "Peeling potatoes", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_9(3986271, "Ship's Cook", "Burnt fish specialist", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_10(5351162, "Able Seaman", "Competent sailor", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_6(1231025, "Plank Walker", "Destined to be one with the ocean", "Rank6.png", new Color(47, 79, 79), new Color(255, 127, 80), new Color(255, 127, 80)),
+	RANK_7(1941869, "Chum Bucket", "A certified snack", "Rank10.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_8(3986271, "Prisoner", "Pretty good at being locked up", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_9(3986271, "Anchor Andy", "Swoll enough to lift heavy things", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_10(2854874, "Galley Slave", "Rowing until the sweet release of death", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	
 	// Ranks 11-20: Building Skills (5.3M - 34.6M)
-	RANK_11(6963729, "Deck Hand", "Trusted crewmate", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_12(8837381, "Rigger", "Rope master", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_13(10984871, "Topman", "Climbing high", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_14(13418385, "Lookout", "Eagle eyes", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_15(16149607, "Navigator", "Chart reader", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_16(19189781, "Gunner", "Cannon operator", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_17(22549755, "Bosun", "Crew supervisor", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_18(26240021, "Master Gunner", "Artillery expert", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_19(30270747, "Sailing Master", "Wind whisperer", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_20(34651806, "Quartermaster", "Supply manager", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	
+	RANK_11(6963729, "Swabbie", "The poop deck wont swab itself", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_12(6963729, "Bailin' Boy", "Go back to your home, water", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_13(6963729, "Cabin Boy", "The Captain requires liquid refreshment", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_14(8837381, "Rope Winder", "Neat and tidy as all things should be", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_15(8837381, "Deck Scrubber", "Stains don't stand a chance", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_16(8837381, "Scallywag", "Where you go, mischief follows", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_17(8837381, "Grog Server Greg", "Ever drank Bailey's from a shoe?", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_18(8837381, "Powder Monkey", "Would never run with scissors", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_19(8837381, "Rat Catcher", "Smarter than your average rat", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_20(8837381, "Deckhand", "Trusted to do at least 1 thing", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+
 	// Ranks 21-30: Experienced (34.6M - 99.7M)
-	RANK_21(39392801, "Carpenter", "Ship builder", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_22(44503084, "Surgeon", "Sawbones", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_23(49991777, "First Mate", "Right hand", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_24(55867787, "Helmsman", "Wheel master", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_25(62139818, "Privateer", "Licensed raider", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_26(68816392, "Buccaneer", "Caribbean terror", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_27(75905850, "Corsair", "Coastal menace", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_28(83416370, "Sea Wolf", "Ocean predator", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_29(91355975, "Marauder", "Island raider", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_30(99732538, "Raider Captain", "Leading raids", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	
+	RANK_21(8837381, "Jack Tar", "Sticky hands, dry boat", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_22(8837381, "Knot Master", "Very Knotty", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_23(8837381, "Rigger", "Likes touching ropes, like a lot", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_24(8837381, "Deckhand", "Trusted to do at least 1 thing", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_25(8837381, "Sail Mender", "Has a pretty high crafting level", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_26(10984871, "Topman", "Look at you climb", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_27(13418385, "Lookout", "Eagle eyes", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_28(13418385, "Crow's Nest Carrie", "Always looking down on others", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_29(13418385, "Rigger", "Expert Swinger", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	RANK_30(13418385, "Able Seaman", "No comment", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+
 	// Ranks 31-40: Notorious (99.7M - 209M)
+
+
+
+//RANK_9(3986271, "Ship's Cook", "Burnt fish specialist", "Rank2.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+// RANK_10(5351162, "Able Seaman", "Competent sailor", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_15(16149607, "Navigator", "Chart reader", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_16(19189781, "Gunner", "Cannon operator", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_17(22549755, "Bosun", "Crew supervisor", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_18(26240021, "Master Gunner", "Artillery expert", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_19(30270747, "Sailing Master", "Wind whisperer", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_20(34651806, "Quartermaster", "Supply manager", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_21(39392801, "Carpenter", "Ship builder", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_22(44503084, "Surgeon", "Sawbones", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_23(49991777, "First Mate", "Right hand", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_24(55867787, "Helmsman", "Wheel master", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_25(62139818, "Privateer", "Licensed raider", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_26(68816392, "Buccaneer", "Caribbean terror", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_27(75905850, "Corsair", "Coastal menace", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_28(83416370, "Sea Wolf", "Ocean predator", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_29(91355975, "Marauder", "Island raider", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+//	RANK_30(99732538, "Raider Captain", "Leading raids", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
+	
+
 	RANK_31(108553796, "Plunderer", "Treasure hunter", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_32(117827350, "Freebooter", "Independent spirit", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_33(127560679, "Brigand", "Lawless bandit", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
@@ -139,7 +162,7 @@ public enum PirateRank
 	RANK_97(1988474204, "Supreme", "Highest peak", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_98(2040662644, "Pinnacle", "Apex achieved", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
 	RANK_99(2093664398, "Zenith", "Maximum height", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32)),
-	RANK_100(Integer.MAX_VALUE, "King of the Pirates", "2,147,483,647 GP", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32));
+	RANK_100(Integer.MAX_VALUE, "King of the Pirates", "There can be only 1", "Rank1.png", new Color(139, 69, 19), new Color(218, 165, 32), new Color(218, 165, 32));
 
 	private final int bootyRequired;
 	private final String displayName;
