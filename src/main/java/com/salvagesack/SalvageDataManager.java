@@ -7,6 +7,8 @@ import net.runelite.client.config.ConfigManager;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,6 +86,14 @@ public class SalvageDataManager
 		Map<ShipwreckType, SalvageData> legacyData = loadLegacyData();
 		if (!legacyData.isEmpty())
 		{
+			// Double-check RSProfile wasn't updated by another instance during file load
+			String existingData = configManager.getRSProfileConfiguration(CONFIG_GROUP, DATA_KEY);
+			if (existingData != null && !existingData.isEmpty())
+			{
+				log.info("RSProfile data appeared during migration check, using RSProfile data");
+				return parseJsonData(existingData);
+			}
+
 			log.info("Migrating legacy file data to RSProfile configuration");
 			saveData(legacyData);
 			// Rename the old file to indicate migration is complete
@@ -185,13 +195,15 @@ public class SalvageDataManager
 		}
 
 		File migratedFile = new File(legacyDataFile.getParentFile(), DATA_FILE + ".migrated");
-		if (legacyDataFile.renameTo(migratedFile))
+		try
 		{
+			Files.move(legacyDataFile.toPath(), migratedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			log.info("Renamed legacy file to {} to indicate migration complete", migratedFile.getName());
 		}
-		else
+		catch (IOException e)
 		{
-			log.warn("Failed to rename legacy file. It will be migrated again on next startup.");
+			log.warn("Failed to rename legacy file: {}. Data was migrated successfully, but " +
+					"the old file remains and may be re-read on next startup.", e.getMessage());
 		}
 	}
 
