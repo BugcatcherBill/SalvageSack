@@ -11,7 +11,7 @@ The Salvage Sack plugin consists of several key components:
 
 ### Core Components
 - **SalvageSackPlugin**: Main plugin class that handles chat messages and coordinates data flow
-- **SalvageDataManager**: Manages persistence of data to disk using JSON
+- **SalvageDataManager**: Manages persistence of data using RSProfile configuration (with file-based migration support)
 - **DropRateManager**: Loads and provides expected drop rates from JSON configuration
 - **ItemIconManager**: Fetches and caches item icons using RuneLite's built-in item manager
 - **SalvageSackPanel**: UI panel that displays the tracked data
@@ -21,7 +21,12 @@ Data is saved automatically:
 - After every loot drop
 - When the plugin shuts down
 
-Data is stored in: `<runelite-config-directory>/salvagesack/salvage-data.json`
+Data is stored using RuneLite's RSProfile configuration system via `ConfigManager.setRSProfileConfiguration()`. This approach:
+- Eliminates file I/O complexity
+- Provides per-profile data storage
+- Integrates with RuneLite's configuration system
+
+**Migration from file-based storage**: On first load, if no RSProfile data exists, the plugin checks for legacy file-based data at `<runelite-config-directory>/salvagesack/salvage-data.json`. If found, the data is automatically migrated to RSProfile configuration and the old file is renamed to `salvage-data.json.migrated`.
 
 ### Chat Message Pattern
 The plugin listens for chat messages matching the pattern:

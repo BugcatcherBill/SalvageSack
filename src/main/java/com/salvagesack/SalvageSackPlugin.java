@@ -75,25 +75,20 @@ public class SalvageSackPlugin extends Plugin
 		ItemIconManager iconManager = new ItemIconManager();
 		iconManager.setItemManager(itemManager);
 
-		// Initialize data manager
+		// Get legacy data directory for migration
 		File runeliteDir = RuneLite.RUNELITE_DIR;
 		if (runeliteDir == null)
 		{
 			runeliteDir = new File(System.getProperty("user.home"), ".runelite");
 		}
-		File dataDirectory = new File(runeliteDir, "salvagesack");
-		if (!dataDirectory.exists())
-		{
-			boolean created = dataDirectory.mkdirs();
-			if (!created)
-			{
-				log.warn("Failed to create data directory: {}", dataDirectory.getAbsolutePath());
-			}
-		}
-		dataManager = new SalvageDataManager(dataDirectory, gson);
+		File legacyDataDirectory = new File(runeliteDir, "salvagesack");
+
+		// Initialize data manager with ConfigManager for RSProfile storage
+		// Legacy directory is passed to allow migration of old file-based data
+		dataManager = new SalvageDataManager(configManager, legacyDataDirectory, gson);
 
 		// Initialize drop rate manager
-		dropRateManager = new DropRateManager(dataDirectory, gson);
+		dropRateManager = new DropRateManager(legacyDataDirectory, gson);
 
 		// Load saved data
 		Map<ShipwreckType, SalvageData> loadedData = dataManager.loadData();
