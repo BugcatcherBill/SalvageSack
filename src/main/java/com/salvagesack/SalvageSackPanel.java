@@ -52,11 +52,14 @@ public class SalvageSackPanel extends PluginPanel
 
 	private final JPanel contentPanel;
 	private final ItemIconManager iconManager;
+	private final SalvageSackConfig config;
 	private final Map<ShipwreckType, Boolean> expandedState = new HashMap<>();
 	private final JLabel totalOpensLabel;
+	private final JPanel titlePanel;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
 	private SortOption currentSortOption;
 	private boolean currentSortDescending;
+	private final PirateRankPanel pirateRankPanel;
 
 	@lombok.Setter
 	private DropRateManager dropRateManager;
@@ -70,48 +73,41 @@ public class SalvageSackPanel extends PluginPanel
 	@lombok.Setter
 	private ConfigManager configManager;
 
+	@lombok.Setter
+	private PirateRankData pirateRankData;
+
 	public SalvageSackPanel(ItemIconManager iconManager, SalvageSackConfig config)
 	{
 		super(false);
 		this.iconManager = iconManager;
+		this.config = config;
 		this.currentSortOption = config.sortOption();
 		this.currentSortDescending = config.sortDescending();
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
-		JPanel titlePanel = new JPanel(new BorderLayout());
-		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-		// Main content panel that fills the space
-		JPanel infoPanel = new JPanel(new GridBagLayout());
-		infoPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weightx = 1.0;
-		gbc.anchor = GridBagConstraints.CENTER;
-
-		// Total salvage label - full width
-		totalOpensLabel = new JLabel("0 Total Salvage Sorted", SwingConstants.CENTER);
+		// Create title panel components that will be added to contentPanel in rebuild()
+		// Total salvage label - center aligned
+		totalOpensLabel = new JLabel("0 Total Salvage Sorted");
 		totalOpensLabel.setForeground(Color.WHITE);
-		totalOpensLabel.setFont(new Font("Arial", Font.BOLD, 12));
+		totalOpensLabel.setFont(new Font("Arial", Font.BOLD, 11));
+		totalOpensLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 2;
-		gbc.insets = new Insets(0, 0, 8, 0);
-		infoPanel.add(totalOpensLabel, gbc);
+		// Sort controls panel - center aligned
+		JPanel sortControlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+		sortControlsPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		sortControlsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
-		// Sort dropdown - expands to fill available space
+		// Sort dropdown
 		JComboBox<SortOption> sortComboBox = new JComboBox<>(SortOption.values());
 		sortComboBox.setSelectedItem(currentSortOption);
 		sortComboBox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		sortComboBox.setForeground(Color.WHITE);
-		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 11));
+		sortComboBox.setFont(new Font("Arial", Font.PLAIN, 10));
 		sortComboBox.setFocusable(false);
 		sortComboBox.setBorder(new CompoundBorder(
 			new LineBorder(ColorScheme.MEDIUM_GRAY_COLOR, 1),
-			new EmptyBorder(4, 8, 4, 8)
+			new EmptyBorder(2, 4, 2, 4)
 		));
 		sortComboBox.addActionListener(e -> {
 			SortOption selected = (SortOption) sortComboBox.getSelectedItem();
@@ -126,17 +122,10 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		});
 		
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.weightx = 1.0;
-		gbc.insets = new Insets(0, 0, 0, 4);
-		infoPanel.add(sortComboBox, gbc);
-		
-		// Sort direction button - fixed width
+		// Sort direction button
 		JButton sortDirectionButton = new JButton(currentSortDescending ? "↓" : "↑");
-		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 16));
-		sortDirectionButton.setPreferredSize(new Dimension(40, 32));
+		sortDirectionButton.setFont(new Font("Arial", Font.BOLD, 14));
+		sortDirectionButton.setPreferredSize(new Dimension(28, 24));
 		sortDirectionButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		sortDirectionButton.setForeground(Color.WHITE);
 		sortDirectionButton.setFocusable(false);
@@ -165,15 +154,18 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		});
 		
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.weightx = 0.0;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		infoPanel.add(sortDirectionButton, gbc);
+		sortControlsPanel.add(sortComboBox);
+		sortControlsPanel.add(sortDirectionButton);
 		
-		titlePanel.add(infoPanel, BorderLayout.CENTER);
-
-		add(titlePanel, BorderLayout.NORTH);
+		// Create title panel with header components (will be added in rebuild)
+		titlePanel = new JPanel();
+		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+		titlePanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		titlePanel.add(totalOpensLabel);
+		titlePanel.add(Box.createVerticalStrut(5));
+		titlePanel.add(sortControlsPanel);
+		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		contentPanel = new JPanel();
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -189,6 +181,9 @@ public class SalvageSackPanel extends PluginPanel
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		add(scrollPane, BorderLayout.CENTER);
+
+		// Initialize pirate rank panel but don't add it yet (will be added in rebuild based on config)
+		pirateRankPanel = new PirateRankPanel();
 
 		rebuild();
 	}
@@ -211,6 +206,13 @@ public class SalvageSackPanel extends PluginPanel
 			}
 		}
 
+		// Update pirate rank display if data is available
+		if (pirateRankData != null && pirateRankPanel != null)
+		{
+			pirateRankPanel.setRankData(pirateRankData);
+			pirateRankPanel.updateDisplay();
+		}
+
 		rebuild();
 	}
 
@@ -218,6 +220,18 @@ public class SalvageSackPanel extends PluginPanel
 	{
 		SwingUtilities.invokeLater(() -> {
 			contentPanel.removeAll();
+
+			// Add pirate rank panel at the top if enabled
+			if (config.enablePirateRanks() && pirateRankPanel != null)
+			{
+				pirateRankPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+				contentPanel.add(pirateRankPanel);
+				contentPanel.add(Box.createVerticalStrut(10));
+			}
+
+			// Add title panel (total salvage and sort controls) below pirate rank panel
+			contentPanel.add(titlePanel);
+			contentPanel.add(Box.createVerticalStrut(10));
 
 			// Calculate total opens across all shipwreck types
 			int totalOpens = 0;
@@ -261,6 +275,8 @@ public class SalvageSackPanel extends PluginPanel
 				}
 			}
 
+			// Add vertical glue to anchor content to the top
+			contentPanel.add(Box.createVerticalGlue());
 
 			contentPanel.revalidate();
 			contentPanel.repaint();
@@ -632,6 +648,18 @@ public class SalvageSackPanel extends PluginPanel
 		int g = (int) (c1.getGreen() + t * (c2.getGreen() - c1.getGreen()));
 		int b = (int) (c1.getBlue() + t * (c2.getBlue() - c1.getBlue()));
 		return new Color(r, g, b);
+	}
+
+	/**
+	 * Update the pirate rank display
+	 */
+	public void updatePirateRankDisplay()
+	{
+		if (pirateRankPanel != null && pirateRankData != null)
+		{
+			pirateRankPanel.setRankData(pirateRankData);
+			pirateRankPanel.updateDisplay();
+		}
 	}
 
 	/**

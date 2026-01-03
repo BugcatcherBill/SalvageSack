@@ -7,6 +7,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -61,7 +62,9 @@ public class SalvageSackPlugin extends Plugin
 	private NavigationButton navButton;
 	private SalvageDataManager dataManager;
 	private DropRateManager dropRateManager;
+	private PirateRankDataManager pirateRankDataManager;
 	private Map<ShipwreckType, SalvageData> salvageDataMap;
+	private PirateRankData pirateRankData;
 
 	@Override
 	protected void startUp()
@@ -90,6 +93,9 @@ public class SalvageSackPlugin extends Plugin
 		// Initialize drop rate manager
 		dropRateManager = new DropRateManager(legacyDataDirectory, gson);
 
+		// Initialize pirate rank data manager
+		pirateRankDataManager = new PirateRankDataManager(dataDirectory, gson);
+
 		// Load saved data
 		Map<ShipwreckType, SalvageData> loadedData = dataManager.loadData();
 		if (loadedData != null && !loadedData.isEmpty())
@@ -98,12 +104,18 @@ public class SalvageSackPlugin extends Plugin
 			log.info("Loaded {} shipwreck types from saved data", loadedData.size());
 		}
 
+		// Load pirate rank data
+		pirateRankData = pirateRankDataManager.loadData();
+		log.info("Loaded pirate rank data: {} with {} booty", 
+			pirateRankData.getCurrentRank().getDisplayName(), pirateRankData.getTotalBooty());
+
 		// Initialize panel
 		panel = new SalvageSackPanel(iconManager, config);
 		panel.setDropRateManager(dropRateManager);
 		panel.setConfigManager(configManager);
 		panel.setOnResetShipwreck(this::resetShipwreckData);
 		panel.setOnResetAll(this::resetAllData);
+		panel.setPirateRankData(pirateRankData);
 		panel.updateData(salvageDataMap);
 
 		// Set up icon loaded callback to repaint panel when async icons finish loading
@@ -157,10 +169,35 @@ public class SalvageSackPlugin extends Plugin
 			log.info("Saved salvage data");
 		}
 
+		// Save pirate rank data
+		if (pirateRankDataManager != null && pirateRankData != null)
+		{
+			pirateRankDataManager.saveData(pirateRankData);
+			log.info("Saved pirate rank data");
+		}
+
 		// Clean up UI
 		if (navButton != null)
 		{
 			clientToolbar.removeNavigation(navButton);
+		}
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (!"salvagesack".equals(event.getGroup()))
+		{
+			return;
+		}
+
+		// Rebuild panel when pirate ranks config changes
+		if ("enablePirateRanks".equals(event.getKey()))
+		{
+			if (panel != null)
+			{
+				panel.updateData(salvageDataMap);
+			}
 		}
 	}
 
@@ -217,8 +254,36 @@ public class SalvageSackPlugin extends Plugin
 			// Record the loot with quantity
 			data.recordLoot(itemId, itemName, expectedRate, quantity);
 
+			// Update pirate rank if enabled
+			if (config.enablePirateRanks() && pirateRankData != null && itemManager != null)
+			{
+				int highAlchValue = getHighAlchValue(itemId);
+				// Validate quantity is reasonable (prevent DoS with extreme values)
+				if (highAlchValue > 0 && quantity > 0 && quantity <= 1000000)
+				{
+					// Cast to long before multiplication to prevent overflow
+					long bootyGained = ((long) highAlchValue) * quantity;
+					boolean rankedUp = pirateRankData.addBooty(bootyGained);
+					
+					if (rankedUp)
+					{
+						log.info("Ranked up to {}!", pirateRankData.getCurrentRank().getDisplayName());
+					}
+					
+					// Save pirate rank data
+					pirateRankDataManager.saveData(pirateRankData);
+					
+					// Update panel
+					if (panel != null)
+					{
+						panel.updatePirateRankDisplay();
+					}
+				}
+			}
+
 			// Update the panel
-			panel.updateData(salvageDataMap);
+            assert panel != null;
+            panel.updateData(salvageDataMap);
 
 			// Save data
 			dataManager.saveData(salvageDataMap);
@@ -269,6 +334,28 @@ public class SalvageSackPlugin extends Plugin
 			return dropRateManager.getExpectedDropRate(shipwreckType, itemName);
 		}
 		return 0.0;
+	}
+
+	/**
+	 * Get the high alch value of an item
+	 * @param itemId The item ID
+	 * @return High alch value in GP, or 0 if unknown
+	 */
+	private int getHighAlchValue(int itemId)
+	{
+		if (itemManager != null && itemId > 0)
+		{
+			try
+			{
+				// ItemManager provides item stats which include high alch value
+				return itemManager.getItemComposition(itemId).getHaPrice();
+			}
+			catch (Exception e)
+			{
+				log.debug("Failed to get high alch value for item {}: {}", itemId, e.getMessage());
+			}
+		}
+		return 0;
 	}
 
 
