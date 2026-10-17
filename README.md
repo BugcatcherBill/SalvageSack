@@ -2,7 +2,7 @@
 
 A RuneLite plugin for Old School RuneScape that tracks salvage loot from the Sailing skill, organized by shipwreck type.
 
-[![Active Installs](http://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/installs/plugin/salvage-sack)](https://runelite.net/plugin-hub/BugcatcherBill) [![Plugin Rank](http://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/rank/plugin/salvage-sack)](https://runelite.net/plugin-hub)
+[![Active Installs](http://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/installs/plugin/salvage-sack)](https://runelite.net/plugin-hub/show/salvage-sack) [![Plugin Rank](http://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/rank/plugin/salvage-sack)](https://runelite.net/plugin-hub)
 
 ![RuneLite](https://img.shields.io/badge/RuneLite-Plugin-orange)
 ![Java](https://img.shields.io/badge/Java-11-blue)
